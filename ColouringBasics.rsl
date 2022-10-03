@@ -13,28 +13,36 @@ class
 	   ("P3","P4"), ("P3","P7"),
 	   ("P4","P5"), ("P4","P6"), ("P4","P7"), ("P4","P8"),
 	   ("P5","P6"), ("P6","P8"), ("P7","P8")},
-  
+  /*
   isRelation : Relation -> Bool
-    isRelation(r) is
+    isRelation(r) is(
     r <<= Relations
-   
-/*
-
+   ),
+*/
     areNb : Piece >< Piece >< Relation -> Bool
-    areNb(cn1, cn2, r) is ...,
+    areNb(cn1, cn2, r) is(
+    let
+    rel = {(cn1, cn2)},
+    inv_rel = {(cn2, cn1)}
+    in
+    rel <<= r \/ inv_rel <<= r
+    end 
+    /*(rel <<= r) \/ (inv_rel <<= r)*/ 
+    )
+    
 
+/*
     isCorrectColouring : Colouring >< Relation -> Bool
     isCorrectColouring(cols, r) is ...,
 
 */
 test_case
+/*
 [t1] isRelation({("P1", "P2")}) = true,
+[f1] isRelation({("P2", "P1")}) = true,
 [t2] isRelation({("P1", "P8")})= false,
-[t3] isRelation({("P1","P2"), ("P1","P3"),
-("P2","P4"), ("P2","P5"),
-("P3","P4"), ("P3","P7"),
-("P4","P5"), ("P4","P6"), ("P4","P7"), ("P4","P8"),
-("P5","P6"),
-("P6","P8"),
-("P7","P8")}) = true
+*/
+[t1] areNb("P2","P1",Relations) = true,
+[t3] areNb("P1","P2",Relations) = true,
+[t4] areNb("P1", "P8", Relations) = false
  end
