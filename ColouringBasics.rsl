@@ -16,8 +16,8 @@ class
   /*
   isRelation : Relation -> Bool
     isRelation(r) is(
-    r <<= Relations
-   ),
+    {} isin r
+   ), 
 */
     areNb : Piece >< Piece >< Relation -> Bool
     areNb(cn1, cn2, r) is(
@@ -27,7 +27,6 @@ class
     in
     rel <<= r \/ inv_rel <<= r
     end 
-    /*(rel <<= r) \/ (inv_rel <<= r)*/ 
     )
     
 
@@ -37,11 +36,7 @@ class
 
 */
 test_case
-/*
-[t1] isRelation({("P1", "P2")}) = true,
-[f1] isRelation({("P2", "P1")}) = true,
-[t2] isRelation({("P1", "P8")})= false,
-*/
+/*[d1] isRelation(Relations) = true,*/
 [t1] areNb("P2","P1",Relations) = true,
 [t3] areNb("P1","P2",Relations) = true,
 [t4] areNb("P1", "P8", Relations) = false
