@@ -4,12 +4,23 @@ class
     Piece = Text,
     Relation = (Piece >< Piece)-set,
     Colour = Piece-set,
-    Colouring = Colour-set
+    Colouring = Colour-set,
+
+    RelationSet = (Relation)-set
     
   value /* auxiliary functions */ 
 
-    isRelation : Relation -> Bool
-    isRelation(r) is ...,
+  RelationList : RelationSet =  (("P1","P2"), ("P1","P3"),
+	   ("P2","P4"), ("P2","P5"),
+	   ("P3","P4"), ("P3","P7"),
+	   ("P4","P5"), ("P4","P6"), ("P4","P7"), ("P4","P8"),
+	   ("P5","P6"), ("P6","P8"), ("P7","P8")),
+  
+  isRelation : Relation -> Bool
+    isRelation(r) is
+    r isin RelationList
+   
+/*
 
     areNb : Piece >< Piece >< Relation -> Bool
     areNb(cn1, cn2, r) is ...,
@@ -17,5 +28,7 @@ class
     isCorrectColouring : Colouring >< Relation -> Bool
     isCorrectColouring(cols, r) is ...,
 
-    ...
+*/
+test_case
+[t1] isRelation(("P1", "P2")) = true
  end
