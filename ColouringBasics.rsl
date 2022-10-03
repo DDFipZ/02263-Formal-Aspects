@@ -28,5 +28,13 @@ class
 
 */
 test_case
-[t1] isRelation({("P1", "P2")}) = true
+[t1] isRelation({("P1", "P2")}) = true,
+[t2] isRelation({("P1", "P8")})= false,
+[t3] isRelation({("P1","P2"), ("P1","P3"),
+("P2","P4"), ("P2","P5"),
+("P3","P4"), ("P3","P7"),
+("P4","P5"), ("P4","P6"), ("P4","P7"), ("P4","P8"),
+("P5","P6"),
+("P6","P8"),
+("P7","P8")}) = true
  end
