@@ -3,8 +3,21 @@ ColouringBasics
 scheme ColouringEx =
 extend ColouringBasics with 
 class
+  /*
   value
+    colour : Colouring = {{p1, p2}, {p3, p5}},
+
+
+   add : Piece -> Bool
+   add(p1) is
+   if
+   (all ps : Colour :- ps isin colour => 
+   (all p : Piece :- p isin ps => ~(areNb(p1, p) \/ p1 = p)))
+   then
+   
    col : Relation -~-> Colouring
-   col(r) is ...
+   col(r) is 
+   (all (p1, p2) : Piece >< Piece :- (p1, p2) isin r => add((p1, p2)))
    pre isRelation(r)
-end
+    */
+  end

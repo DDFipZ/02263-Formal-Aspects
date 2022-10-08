@@ -1,51 +1,62 @@
-scheme  ColouringBasics =
-class
-  type 
-    Piece = Text,
-    Relation = (Piece >< Piece)-set,
-    Colour = Piece-set,
-    Colouring = Colour-set
-    
-  value /* auxiliary functions */ 
-
-  Relations : Relation =  {("P1","P2"), ("P1","P3"),
-	   ("P2","P4"), ("P2","P5"),
-	   ("P3","P4"), ("P3","P7"),
-	   ("P4","P5"), ("P4","P6"), ("P4","P7"), ("P4","P8"),
-	   ("P5","P6"), ("P6","P8"), ("P7","P8")},
-
-  colourSet : Colouring = {{"P1","P4"}, {"P6"}, {"P2","P3","P8"}, {"P5","P7"}},
- /*A piece cannot be a neighboor with itself AND there may not be the "same" crossproduct but reversed*/
-  isRelation : Relation -> Bool
-  isRelation(r) is 
-   (all (p1, p2) : Piece >< Piece :- (p1, p2) isin r => p1 ~= p2 /\
-   (all (ps1, ps2) : Piece >< Piece :- (ps1, ps2) isin r => ~(ps1 = p2 /\ ps2 = p1))),
-    -- areNb : Piece >< Piece >< Relation -> Bool
-    -- areNb(cn1, cn2, r) is(
-    -- let
-    -- rel = {(cn1, cn2)},
-    -- inv_rel = {(cn2, cn1)}
-    -- in
-    -- rel <<= r \/ inv_rel <<= r
-    -- end 
-    -- )
-    areNb : Piece >< Piece >< Relation -> Bool
+scheme ColouringBasics = 
+  class 
+    type 
+      Piece = Text, 
+      Relation = (Piece >< Piece)-set, 
+      Colour = Piece-set, 
+      Colouring = Colour-set 
+    	 
+    value /* auxiliary functions */ 
+      Relations : Relation = 
+        {("P7", "P8"), ("P1", "P2"), ("P1", "P3"), ("P2", "P4"), ("P2", "P5"), ("P3", "P4"), 
+         ("P3", "P7"), ("P4", "P5"), ("P4", "P6"), ("P4", "P7"), ("P4", "P8"), 
+         ("P5", "P6"), ("P6", "P8")}, 
+      colourSet : Colouring = 
+        {{"P1", "P4"}, {"P6"}, {"P2", "P3", "P8"}, {"P5", "P7"}}, 
+      	 
+      /*A piece cannot be a neighboor with itself AND there may not be the
+      "same" crossproduct but reversed*/ 
+      isRelation : Relation -> Bool
+      isRelation(r) is 
+        (all (p1, p2) : Piece >< Piece :- 
+           (p1, p2) isin r => 
+             p1 ~= p2 /\ 
+             (all (ps1, ps2) : Piece >< Piece :- 
+                (ps1, ps2) isin r => ~ (ps1 = p2 /\ ps2 = p1))), 
+      	
+      areNb : Piece >< Piece >< Relation -> Bool
       areNb(cn1, cn2, r) is 
-      (exists (p1, p2) : Piece >< Piece :- (p1, p2) isin r /\ (p1 = cn1 /\ p2 = cn2)) \/ 
-      (exists (p2, p1) : Piece >< Piece :- (p2, p1) isin r /\ (p1 = cn1 /\ p2 = cn2)),
-
-    isCorrectColouring : Colouring >< Relation -> Bool
-    isCorrectColouring(cols, r) is 
-    (all ps : Colour :- ps isin cols => 
-    (all p1 : Piece :- p1 isin ps =>
-    (all p2 : Piece :- p2 isin {p | p : Piece :- p isin ps /\ p ~= p1} => ~areNb(p1, p2, r))))
-    
-
-
-test_case
-/*[d1] isRelation(Relations) = true,*/
-[t1] areNb("P2","P1",Relations),
-[t3] areNb("P1","P2",Relations),
-[t4] areNb("P1", "P8", Relations),
-[t5] isCorrectColouring(colourSet, Relations)
- end
+        (exists (p1, p2) : Piece >< Piece :- 
+           (p1, p2) isin r /\ (p1 = cn1 /\ p2 = cn2)) \/ 
+        (exists (p2, p1) : Piece >< Piece :- 
+           (p2, p1) isin r /\ (p1 = cn1 /\ p2 = cn2)), 
+      	
+      isCorrectColouring : Colouring >< Relation -> Bool
+      isCorrectColouring(cols, r) is 
+        (all ps : Colour :- 
+           ps isin cols => 
+             (all p1 : Piece :- 
+                p1 isin ps => 
+                  (all p2 : Piece :- 
+                     p2 isin {p | p : Piece :- p isin ps /\ p ~= p1} => 
+                       ~ areNb(p1, p2, r)))) 
+    	
+    test_case 
+      /*[d1] isRelation(Relations) = true,*/
+      [t1]
+        areNb("P2", "P1", Relations), 
+      [t2]
+        isRelation(Relations), 
+      [t3]
+        areNb("P1", "P2", Relations), 
+      [t4]
+        areNb("P1", "P8", Relations), 
+      [t5]
+        isCorrectColouring(colourSet, Relations),
+      [t6]
+        Relations,
+      [t7]
+        hd(Relations),
+        [t8]
+        hd(Relations)
+  end
