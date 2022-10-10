@@ -3,21 +3,43 @@ ColouringBasics
 scheme ColouringEx =
 extend ColouringBasics with 
 class
-  /*
+  
   value
-    colour : Colouring = {{p1, p2}, {p3, p5}},
-
-
-   add : Piece -> Bool
-   add(p1) is
-   if
-   (all ps : Colour :- ps isin colour => 
-   (all p : Piece :- p isin ps => ~(areNb(p1, p) \/ p1 = p)))
-   then
    
-   col : Relation -~-> Colouring
-   col(r) is 
-   (all (p1, p2) : Piece >< Piece :- (p1, p2) isin r => add((p1, p2)))
+  empty : Colouring = {{}},
+
+
+   remove : Piece >< RelationMap -> RelationMap
+   remove((p, r)) is
+   r \ {p},
+
+   create_colour : Colour >< Piece >< RelationMap >< RelationMap -> Colour
+   create_colour((c, p, r, rm)) is
+   if (r = []) then c else if ((all ps : Piece :- ps isin c => ~areNb(ps, p, rm))) then create_colour(c union {p}, hd(dom r), remove((p, r)), rm) else create_colour(c, hd(dom r), remove((p, r)), rm) end end,
+
+   create_colouring : Colouring >< Piece >< RelationMap >< RelationMap -> Colouring
+   create_colouring((cl, p, r, rm)) is
+   {create_colour({}, hd(dom r), remove((p, r)), rm)},  
+
+   
+
+  --  check_colour : Colouring >< Piece >< RelationMap -> Colour
+  --  check_colour((cl, ps, r)) is
+  --  (all c : Colour :- c isin cl /\ ps ~isin c /\ (all p : Piece :- p isin c /\ areNb(p, ps, r)) => c union {ps})
+
+  
+  
+
+   col : RelationMap -~-> Colouring
+   col(r) is
+   create_colouring((empty, hd(dom r), r, r))
    pre isRelation(r)
-    */
+
+  test_case
+    [t1]
+      hd(empty),
+    [t2]
+      remove("P2", relationMap),
+    [t3]
+      col(relationMap)
   end
