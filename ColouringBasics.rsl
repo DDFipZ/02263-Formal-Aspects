@@ -24,35 +24,29 @@ scheme ColouringBasics =
         "P7" +> {"P4", "P8"},
         "P8" +> {"P4", "P6", "P7"}],
       
-        isRelation : RelationMap -> Bool
-        isRelation(r) is 
-          (all ps : Piece-set :- ps isin rng r => ps <<= dom r) /\
-          (all p : Piece :- p isin dom r => p ~isin {s | s : Piece :- s isin r(p) }),
+      isRelation : Relation -> Bool
+      isRelation(r) is 
+        (all (p1, p2) : Piece >< Piece :- 
+           (p1, p2) isin r => 
+             p1 ~= p2 /\ 
+             (all (ps1, ps2) : Piece >< Piece :- 
+                (ps1, ps2) isin r => ~ (ps1 = p2 /\ ps2 = p1))),
 
-        areNb : Piece >< Piece >< RelationMap -> Bool
-        areNb(cn1, cn2, r) is
-          cn1 isin r(cn2)
-          pre cn1 isin dom r,
+      
       
       
         /*A piece cannot be a neighboor with itself AND there may not be the
       "same" crossproduct but reversed*/ 
-      -- isRelation : Relation -> Bool
-      -- isRelation(r) is 
-      --   (all (p1, p2) : Piece >< Piece :- 
-      --      (p1, p2) isin r => 
-      --        p1 ~= p2 /\ 
-      --        (all (ps1, ps2) : Piece >< Piece :- 
-      --           (ps1, ps2) isin r => ~ (ps1 = p2 /\ ps2 = p1))), 
       	
-      -- areNb : Piece >< Piece >< Relation -> Bool
-      -- areNb(cn1, cn2, r) is 
-      --   (exists (p1, p2) : Piece >< Piece :- 
-      --      (p1, p2) isin r /\ (p1 = cn1 /\ p2 = cn2)) \/ 
-      --   (exists (p2, p1) : Piece >< Piece :- 
-      --      (p2, p1) isin r /\ (p1 = cn1 /\ p2 = cn2)), 
+       areNb : Piece >< Piece >< Relation -> Bool
+       areNb(cn1, cn2, r) is 
+         (exists (p1, p2) : Piece >< Piece :- 
+            (p1, p2) isin r /\ (p1 = cn1 /\ p2 = cn2)) \/ 
+        (exists (p2, p1) : Piece >< Piece :- 
+            (p2, p1) isin r /\ (p1 = cn1 /\ p2 = cn2)), 
       	
-      isCorrectColouring : Colouring >< RelationMap -> Bool
+
+      isCorrectColouring : Colouring >< Relation -> Bool
       isCorrectColouring(cols, r) is 
         (all ps : Colour :- 
            ps isin cols => 
@@ -61,9 +55,12 @@ scheme ColouringBasics =
                   (all p2 : Piece :- 
                      p2 isin {p | p : Piece :- p isin ps /\ p ~= p1} => 
                        ~ areNb(p1, p2, r)))) 
+
+
     	 
     test_case 
       /*[d1] isRelation(Relations) = true,*/
+/*
       [t1]
         areNb("P2", "P1", relationMap), 
       [t2]
@@ -76,5 +73,7 @@ scheme ColouringBasics =
         isCorrectColouring(colourSet, relationMap), 
       [t6]
         hd(relationMap)
-
+*/
+[t1]
+	hd(Relations)
   end
