@@ -2,19 +2,18 @@ scheme ColouringBasics =
   class 
     type 
       Piece = Text, 
-      RelationMap = Piece -m-> Piece-set, 
-      Relation = (Piece >< Piece)-set, 
+      Relation = Piece -m-> Piece-set, 
       Colour = Piece-set, 
       Colouring = Colour-set 
     	 
     value /* auxiliary functions */ 
-      Relations : Relation = 
-        {("P7", "P8"), ("P1", "P2"), ("P1", "P3"), ("P2", "P4"), ("P2", "P5"), 
-         ("P3", "P4"), ("P3", "P7"), ("P4", "P5"), ("P4", "P6"), ("P4", "P7"), 
-         ("P4", "P8"), ("P5", "P6"), ("P6", "P8")}, 
+      -- Relations : Relation = 
+      --   {("P7", "P8"), ("P1", "P2"), ("P1", "P3"), ("P2", "P4"), ("P2", "P5"), 
+      --    ("P3", "P4"), ("P3", "P7"), ("P4", "P5"), ("P4", "P6"), ("P4", "P7"), 
+      --    ("P4", "P8"), ("P5", "P6"), ("P6", "P8")}, 
       colourSet : Colouring = 
         {{"P1", "P4"}, {"P6"}, {"P2", "P3", "P8"}, {"P5", "P7"}}, 
-      relationMap : RelationMap = 
+      relationMap : Relation = 
         ["P1" +> {"P2", "P3", "P8", "P6", "P7", "P5"}, 
         "P2" +> {"P1", "P4", "P5"}, 
         "P3" +> {"P1", "P4", "P7"}, 
@@ -24,12 +23,12 @@ scheme ColouringBasics =
         "P7" +> {"P4", "P8"},
         "P8" +> {"P4", "P6", "P7"}],
       
-        isRelation : RelationMap -> Bool
+        isRelation : Relation -> Bool
         isRelation(r) is 
           (all ps : Piece-set :- ps isin rng r => ps <<= dom r) /\
           (all p : Piece :- p isin dom r => p ~isin {s | s : Piece :- s isin r(p) }),
 
-        areNb : Piece >< Piece >< RelationMap -> Bool
+        areNb : Piece >< Piece >< Relation -> Bool
         areNb(cn1, cn2, r) is
           cn1 isin r(cn2) \/ cn2 isin r(cn1)
           pre (cn1 isin dom r \/ cn2 isin dom r),
@@ -52,7 +51,7 @@ scheme ColouringBasics =
       --   (exists (p2, p1) : Piece >< Piece :- 
       --      (p2, p1) isin r /\ (p1 = cn1 /\ p2 = cn2)), 
       	
-      isCorrectColouring : Colouring >< RelationMap -> Bool
+      isCorrectColouring : Colouring >< Relation -> Bool
       isCorrectColouring(cols, r) is 
         (all ps : Colour :- 
            ps isin cols => 
