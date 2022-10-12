@@ -45,6 +45,9 @@ class
 
 
   test_case 
+
+------------------- ColouringBasics tests ----------------------
+    
     [isRelation1] -- default
 	isRelation(relationMapTest1),
     [isRelation2] -- nonreciprocal neighbour
@@ -64,9 +67,11 @@ class
     [isCorrectColouring2] -- same piece multiple colours
 	~(isCorrectColouring(colourSetTest2, relationMap)),
     [isCorrectColouring3] -- neighbours same colour
-	~(isCorrectColouring(colourSetTest3, relationMap))
+	~(isCorrectColouring(colourSetTest3, relationMap)),
 	
-	
+------------------- ColouringEx tests ----------------------
 
+    [remove]
+	remove({"P1", "P2"}, relationMap))
  end
  
