@@ -6,20 +6,21 @@ class
   
   value
    
-  empty : Colouring = {{}},
+  empty : Colouring = {},
 
 
-   remove : Piece >< RelationMap -> RelationMap
+   remove : Piece-set >< RelationMap -> RelationMap
    remove((p, r)) is
-   r \ {p},
+   r \ p,
 
    create_colour : Colour >< Piece >< RelationMap >< RelationMap -> Colour
    create_colour((c, p, r, rm)) is
-   if (r = []) then c else if ((all ps : Piece :- ps isin c => ~areNb(ps, p, rm))) then create_colour(c union {p}, hd(dom r), remove((p, r)), rm) else create_colour(c, hd(dom r), remove((p, r)), rm) end end,
+   if (r = []) then c else if ((all ps : Piece :- ps isin c => ~areNb(ps, p, rm))) then create_colour(c union {p}, hd(r), remove(({p}, r)), rm) else create_colour(c, hd(r), remove(({p}, r)), rm) end end,
 
-   create_colouring : Colouring >< Piece >< RelationMap >< RelationMap -> Colouring
-   create_colouring((cl, p, r, rm)) is
-   {create_colour({}, hd(dom r), remove((p, r)), rm)},  
+   create_colouring : Colouring >< RelationMap >< RelationMap -> Colouring
+   create_colouring((cl, r, rm)) is
+   if(rm = []) then cl else
+   create_colouring(cl union {create_colour({}, hd(rm), r, rm)}, remove((create_colour({}, hd(r), r, rm), r)), remove((create_colour({}, hd(r), r, rm)), rm)) end, 
 
    
 
@@ -32,14 +33,12 @@ class
 
    col : RelationMap -~-> Colouring
    col(r) is
-   create_colouring((empty, hd(dom r), r, r))
+   create_colouring((empty, r, r))
    pre isRelation(r)
 
   test_case
     [t1]
       hd(empty),
-    [t2]
-      remove("P2", relationMap),
     [t3]
       col(relationMap)
   end

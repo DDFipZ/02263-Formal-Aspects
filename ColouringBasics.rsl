@@ -15,7 +15,7 @@ scheme ColouringBasics =
       colourSet : Colouring = 
         {{"P1", "P4"}, {"P6"}, {"P2", "P3", "P8"}, {"P5", "P7"}}, 
       relationMap : RelationMap = 
-        ["P1" +> {"P2", "P3"}, 
+        ["P1" +> {"P2", "P3", "P8", "P6", "P7", "P5"}, 
         "P2" +> {"P1", "P4", "P5"}, 
         "P3" +> {"P1", "P4", "P7"}, 
         "P4" +> {"P2", "P3", "P5", "P6", "P7", "P8"},
@@ -31,8 +31,8 @@ scheme ColouringBasics =
 
         areNb : Piece >< Piece >< RelationMap -> Bool
         areNb(cn1, cn2, r) is
-          cn1 isin r(cn2)
-          pre cn1 isin dom r,
+          cn1 isin r(cn2) \/ cn2 isin r(cn1)
+          pre (cn1 isin dom r \/ cn2 isin dom r),
       
       
         /*A piece cannot be a neighboor with itself AND there may not be the
