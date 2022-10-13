@@ -4,46 +4,65 @@ scheme testColouringEx =
 extend ColouringEx with 
 class
   value 
-      colourSetTest : Colouring = 
+    relationFigure1 : Relation = --Relation of the pieces in Figure 1
+    ["P1" +> {"P3", "P2"},
+    "P2" +> {"P1", "P4", "P5"},
+    "P3" +> {"P1", "P4", "P7"},
+    "P4" +> {"P2", "P3", "P5", "P6", "P7", "P8"},
+    "P5" +> {"P2", "P4", "P6"},
+    "P6" +> {"P4", "P5", "P8"},
+    "P7" +> {"P3", "P4", "P8"},
+    "P8" +> {"P4", "P6", "P7"}],
+
+    relationMapTest1 : Relation = -- Well-formed custom relation
+    ["P1" +> {"P2", "P3", "P8", "P6", "P7", "P5"}, 
+    "P2" +> {"P1", "P4", "P5"}, 
+    "P3" +> {"P1", "P4", "P7"}, 
+    "P4" +> {"P2", "P3", "P5", "P6", "P7", "P8"},
+    "P5" +> {"P2", "P4", "P6", "P1"},
+    "P6" +> {"P4", "P5", "P8", "P1"},
+    "P7" +> {"P4", "P8", "P1", "P3"},
+    "P8" +> {"P4", "P6", "P7", "P1"}],
+
+    relationMapTest2 : Relation = -- Relation where theres nonreciprocal relations between two pieces
+    ["P1" +> {"P3", "P8", "P6", "P7", "P5"}, 
+    "P2" +> {"P1", "P4", "P5"}, 
+    "P3" +> {"P1", "P4", "P7"}, 
+    "P4" +> {"P2", "P3", "P5", "P6", "P7", "P8"},
+    "P5" +> {"P2", "P4", "P6"},
+    "P6" +> {"P4", "P5", "P8"},
+    "P7" +> {"P4", "P8"},
+    "P8" +> {"P4", "P6", "P7"}],
+
+    relationMapTest3 : Relation = -- Relation where a piece is neighbor with itself
+    ["P1" +> {"P1", "P3", "P8", "P6", "P7", "P5"}, 
+    "P2" +> {"P1", "P4", "P5"}, 
+    "P3" +> {"P1", "P4", "P7"}, 
+    "P4" +> {"P2", "P3", "P5", "P6", "P7", "P8"},
+    "P5" +> {"P2", "P4", "P6"},
+    "P6" +> {"P4", "P5", "P8"},
+    "P7" +> {"P4", "P8"},
+    "P8" +> {"P4", "P6", "P7"}],
+
+    relationMapTest4 : Relation = -- Relation where there is a piece with no neighbor
+    ["P1" +> {"P1", "P3", "P8", "P6", "P7", "P5"}, 
+    "P2" +> {"P1", "P4", "P5"}, 
+    "P3" +> {"P1", "P4", "P7"}, 
+    "P4" +> {"P2", "P3", "P5", "P6", "P7", "P8"},
+    "P5" +> {"P2", "P4", "P6"},
+    "P6" +> {"P4", "P5", "P8"},
+    "P7" +> {"P4", "P8"},
+    "P8" +> {"P4", "P6", "P7"},
+    "P9" +> {}],
+
+    colourSetTest1 : Colouring = -- Correct colouring
         {{"P1", "P4"}, {"P6"}, {"P2", "P3", "P8"}, {"P5", "P7"}}, 
-
-      relationMapTest1 : Relation = 
-        ["P1" +> {"P2", "P3", "P8", "P6", "P7", "P5"}, 
-        "P2" +> {"P1", "P4", "P5"}, 
-        "P3" +> {"P1", "P4", "P7"}, 
-        "P4" +> {"P2", "P3", "P5", "P6", "P7", "P8"},
-        "P5" +> {"P2", "P4", "P6", "P1"},
-        "P6" +> {"P4", "P5", "P8", "P1"},
-        "P7" +> {"P4", "P8", "P1", "P3"},
-        "P8" +> {"P4", "P6", "P7", "P1"}],
-
-      relationMapTest2 : Relation = 
-        ["P1" +> {"P3", "P8", "P6", "P7", "P5"}, 
-        "P2" +> {"P1", "P4", "P5"}, 
-        "P3" +> {"P1", "P4", "P7"}, 
-        "P4" +> {"P2", "P3", "P5", "P6", "P7", "P8"},
-        "P5" +> {"P2", "P4", "P6"},
-        "P6" +> {"P4", "P5", "P8"},
-        "P7" +> {"P4", "P8"},
-        "P8" +> {"P4", "P6", "P7"}],
-      relationMapTest3 : Relation = 
-        ["P1" +> {"P1", "P3", "P8", "P6", "P7", "P5"}, 
-        "P2" +> {"P1", "P4", "P5"}, 
-        "P3" +> {"P1", "P4", "P7"}, 
-        "P4" +> {"P2", "P3", "P5", "P6", "P7", "P8"},
-        "P5" +> {"P2", "P4", "P6"},
-        "P6" +> {"P4", "P5", "P8"},
-        "P7" +> {"P4", "P8"},
-        "P8" +> {"P4", "P6", "P7"}],
-	colourSetTest2 : Colouring = 
-        {{"P1", "P4"}, {"P6"}, {"P2", "P1", "P3", "P8"}, {"P5",
-	"P7"}},
-
-	colourSetTest3 : Colouring = 
-        {{"P1", "P3", "P4"}, {"P6"}, {"P2", "P8"}, {"P5",
-	"P7"}}
-
-
+	colourSetTest2 : Colouring = -- Piece has multiple colourings
+        {{"P1", "P4"}, {"P6"}, {"P2", "P1", "P3", "P8"}, {"P5","P7"}},
+	colourSetTest3 : Colouring = -- neighbours same colour
+        {{"P1", "P3", "P4"}, {"P6"}, {"P2", "P8"}, {"P5","P7"}},
+    colourSetTest4 : Colouring = -- all pieces must have a colour
+        {{"P1"}, {"P6"}, {"P2", "P8"}, {"P5","P7"}}
   test_case 
 
 ------------------- ColouringBasics tests ----------------------
@@ -54,7 +73,9 @@ class
 	~(isRelation(relationMapTest2)),
     [isRelation3] -- must not neighbour itself
 	~(isRelation(relationMapTest3)),
-
+    [isRelation4] -- must have a neighbour
+    ~(isRelation(relationMapTest4)),
+    
     [areNb1] -- default
 	areNb("P1", "P2", relationMapTest1),
     [areNb2] -- neighbours
@@ -63,15 +84,43 @@ class
 	~(areNb("P1", "P4", relationMapTest1)),
 
     [isCorrectColouring1] -- default
-	isCorrectColouring(colourSetTest, relationMapTest1),
+	isCorrectColouring(colourSetTest1, relationMapTest1),
     [isCorrectColouring2] -- same piece multiple colours
 	~(isCorrectColouring(colourSetTest2, relationMapTest1)),
     [isCorrectColouring3] -- neighbours same colour
-	~(isCorrectColouring(colourSetTest3, relationMapTest1))
+	~(isCorrectColouring(colourSetTest3, relationMapTest1)),
+    [isCorrectColouring4] -- all pieces must have a colour
+    ~(isCorrectColouring(colourSetTest3, relationMapTest1)),
 	
 ------------------- ColouringEx tests ----------------------
 
-    -- [remove]
-	-- remove({"P1", "P2"}, relationMap))
+    [remove] -- simple remove function that removes elements from the relation map
+	remove({"P1", "P2"}, relationMapTest1) = 
+        ["P3" +> {"P1", "P4", "P7"}, 
+        "P4" +> {"P2", "P3", "P5", "P6", "P7", "P8"},
+        "P5" +> {"P2", "P4", "P6", "P1"},
+        "P6" +> {"P4", "P5", "P8", "P1"},
+        "P7" +> {"P4", "P8", "P1", "P3"},
+        "P8" +> {"P4", "P6", "P7", "P1"}],
+
+    /*
+    Creates a single colour from the relation. isCorrectColouring will return false 
+    because the colouring do not contain all the pieces in the relation.
+    */
+    [createColour] 
+    createColour({}, hd (relationMapTest1), relationMapTest1, relationMapTest1),
+    [createColouring] -- Creates the colouring
+    createColouring({}, relationMapTest1, relationMapTest1),
+
+    [col1] -- Custom relation colouring and post condition
+    isCorrectColouring(col(relationMapTest1), relationMapTest1),
+    [col2] -- Using a relation not well-formed will result in the precondition not satisfied
+    isCorrectColouring(col(relationMapTest2), relationMapTest2),
+
+    [figure1test1] -- Figure 1 colouring
+    col(relationFigure1),
+    [figure1test2] -- Figure 1 colouring and post condition test
+    isCorrectColouring(col(relationFigure1), relationFigure1)
+
  end
  
