@@ -3,7 +3,6 @@ scheme ColouringBasics =
     type 
       Piece = Text, 
       Relation = Piece -m-> Piece-set, 
-      RelationSet = (Piece >< Piece)-set, 
       Colour = Piece-set, 
       Colouring = Colour-set 
     	 
