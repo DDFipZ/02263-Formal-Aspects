@@ -1,0 +1,39 @@
+scheme ColouringBasics = 
+  class 
+    type 
+      Piece = Text, 
+      Relation = Piece -m-> Piece-set, 
+      RelationSet = (Piece >< Piece)-set, 
+      Colour = Piece-set, 
+      Colouring = Colour-set 
+    	 
+    value /* auxiliary functions */ 
+      isRelation : Relation -> Bool
+      isRelation(r) is 
+        (all ps : Piece-set :- ps isin rng r => ps <<= dom r) /\ --Requirement 2
+        (all p : Piece :- 
+           p isin dom r => 
+             p ~isin r(p) /\ -- Requirement 1
+             (all pv : Piece :- pv isin r(p) => p isin r(pv)) /\ -- Requirement 3
+             r(p) ~= {}), -- Requirement 4
+      	
+      areNb : Piece >< Piece >< Relation -> Bool
+      areNb(cn1, cn2, r) is cn1 isin r(cn2) 
+      pre cn1 isin dom r, 
+
+      isCorrectColouring : Colouring >< Relation -> Bool
+      isCorrectColouring(cols, r) is 
+        (all ps : Colour :- 
+           ps isin cols => 
+             (all p1 : Piece :- 
+                p1 isin ps => 
+                  (all p2 : Piece :- 
+                     p2 isin {p | p : Piece :- p isin ps /\ p ~= p1} => 
+                       ~ areNb(p1, p2, r))) /\ ps ~= {}) /\ -- Requirement 1 and 2
+        ~ (exists ps1 : Colour :- 
+             ps1 isin cols /\ 
+             (exists ps2 : Colour :- 
+                ps2 isin cols /\ ps1 ~= ps2 /\ 
+                (ps1 \ ps2 ~= ps1 \/ ps2 \ ps1 ~= ps2))) -- Requirement 3
+
+  end
