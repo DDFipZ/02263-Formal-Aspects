@@ -4,10 +4,74 @@ scheme testColouringEx =
 extend ColouringEx with 
 class
   value 
-    ... 
+      colourSetTest : Colouring = 
+        {{"P1", "P4"}, {"P6"}, {"P2", "P3", "P8"}, {"P5", "P7"}}, 
+
+      relationMapTest1 : RelationMap = 
+        ["P1" +> {"P2", "P3", "P8", "P6", "P7", "P5"}, 
+        "P2" +> {"P1", "P4", "P5"}, 
+        "P3" +> {"P1", "P4", "P7"}, 
+        "P4" +> {"P2", "P3", "P5", "P6", "P7", "P8"},
+        "P5" +> {"P2", "P4", "P6"},
+        "P6" +> {"P4", "P5", "P8"},
+        "P7" +> {"P4", "P8"},
+        "P8" +> {"P4", "P6", "P7"}],
+
+      relationMapTest2 : RelationMap = 
+        ["P1" +> {"P3", "P8", "P6", "P7", "P5"}, 
+        "P2" +> {"P1", "P4", "P5"}, 
+        "P3" +> {"P1", "P4", "P7"}, 
+        "P4" +> {"P2", "P3", "P5", "P6", "P7", "P8"},
+        "P5" +> {"P2", "P4", "P6"},
+        "P6" +> {"P4", "P5", "P8"},
+        "P7" +> {"P4", "P8"},
+        "P8" +> {"P4", "P6", "P7"}],
+      relationMapTest3 : RelationMap = 
+        ["P1" +> {"P1", "P3", "P8", "P6", "P7", "P5"}, 
+        "P2" +> {"P1", "P4", "P5"}, 
+        "P3" +> {"P1", "P4", "P7"}, 
+        "P4" +> {"P2", "P3", "P5", "P6", "P7", "P8"},
+        "P5" +> {"P2", "P4", "P6"},
+        "P6" +> {"P4", "P5", "P8"},
+        "P7" +> {"P4", "P8"},
+        "P8" +> {"P4", "P6", "P7"}],
+	colourSetTest2 : Colouring = 
+        {{"P1", "P4"}, {"P6"}, {"P2", "P1", "P3", "P8"}, {"P5",
+	"P7"}},
+
+	colourSetTest3 : Colouring = 
+        {{"P1", "P3", "P4"}, {"P6"}, {"P2", "P8"}, {"P5",
+	"P7"}}
+
 
   test_case 
-    ...
 
+------------------- ColouringBasics tests ----------------------
+    
+    [isRelation1] -- default
+	isRelation(relationMapTest1),
+    [isRelation2] -- nonreciprocal neighbour
+	~(isRelation(relationMapTest2)),
+    [isRelation3] -- must not neighbour itself
+	~(isRelation(relationMapTest3)),
+
+    [areNb1] -- default
+	areNb("P1", "P2", relationMap),
+    [areNb2] -- neighbours
+	areNb("P2", "P1", relationMap),
+    [areNb3] -- not neighbours
+	~(areNb("P1", "P4", relationMap)),
+
+    [isCorrectColouring1] -- default
+	isCorrectColouring(colourSet, relationMap),
+    [isCorrectColouring2] -- same piece multiple colours
+	~(isCorrectColouring(colourSetTest2, relationMap)),
+    [isCorrectColouring3] -- neighbours same colour
+	~(isCorrectColouring(colourSetTest3, relationMap)),
+	
+------------------- ColouringEx tests ----------------------
+
+    [remove]
+	remove({"P1", "P2"}, relationMap))
  end
  
