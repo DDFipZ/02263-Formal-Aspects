@@ -8,19 +8,6 @@ scheme ColouringBasics =
       Colouring = Colour-set 
     	 
     value /* auxiliary functions */ 
-      Relations : RelationSet = 
-        {("P7", "P8"), ("P1", "P2"), ("P1", "P3"), ("P2", "P4"), ("P2", "P5"), 
-         ("P3", "P4"), ("P3", "P7"), ("P4", "P5"), ("P4", "P6"), ("P4", "P7"), 
-         ("P4", "P8"), ("P5", "P6"), ("P6", "P8")}, 
-      colourSet : Colouring = 
-        {{"P3"}, {"P7", "P1", "P6"}, {"P8", "P2"}, {"P5"}, {"P4", "P1"}}, 
-      relationMap : Relation = 
-        ["P1" +> {"P2", "P3", "P8"}, "P2" +> {"P1", "P4", "P5", "P3"}, 
-         "P3" +> {"P1", "P4", "P7", "P5", "P2"}, 
-         "P4" +> {"P2", "P3", "P5", "P6", "P7", "P8"}, 
-         "P5" +> {"P2", "P4", "P6", "P3"}, "P6" +> {"P4", "P5", "P8"}, 
-         "P7" +> {"P4", "P8", "P3"}, "P8" +> {"P4", "P6", "P7", "P1"}], 
-      	
       isRelation : Relation -> Bool
       isRelation(r) is 
         (all ps : Piece-set :- ps isin rng r => ps <<= dom r) /\ --Requirement 2
@@ -31,23 +18,9 @@ scheme ColouringBasics =
              r(p) ~= {}), -- Requirement 4
       	
       areNb : Piece >< Piece >< Relation -> Bool
-      areNb(cn1, cn2, r) is cn1 isin r(cn2) pre cn1 isin dom r, 
-      	 
-      /*A piece cannot be a neighboor with itself AND there may not be the
-      "same" crossproduct but reversed*/
-      -- isRelation : Relation -> Bool
-      -- isRelation(r) is 
-      --   (all (p1, p2) : Piece >< Piece :- 
-      --      (p1, p2) isin r => 
-      --        p1 ~= p2 /\ 
-      --        (all (ps1, ps2) : Piece >< Piece :- 
-      --           (ps1, ps2) isin r => ~ (ps1 = p2 /\ ps2 = p1))), 
-      -- areNb : Piece >< Piece >< Relation -> Bool
-      -- areNb(cn1, cn2, r) is 
-      --   (exists (p1, p2) : Piece >< Piece :- 
-      --      (p1, p2) isin r /\ (p1 = cn1 /\ p2 = cn2)) \/ 
-      --   (exists (p2, p1) : Piece >< Piece :- 
-      --      (p2, p1) isin r /\ (p1 = cn1 /\ p2 = cn2)),  
+      areNb(cn1, cn2, r) is cn1 isin r(cn2) 
+      pre cn1 isin dom r, 
+
       isCorrectColouring : Colouring >< Relation -> Bool
       isCorrectColouring(cols, r) is 
         (all ps : Colour :- 
@@ -56,25 +29,11 @@ scheme ColouringBasics =
                 p1 isin ps => 
                   (all p2 : Piece :- 
                      p2 isin {p | p : Piece :- p isin ps /\ p ~= p1} => 
-                       ~ areNb(p1, p2, r))) /\ ps ~= {}) /\ 
+                       ~ areNb(p1, p2, r))) /\ ps ~= {}) /\ -- Requirement 1 and 2
         ~ (exists ps1 : Colour :- 
              ps1 isin cols /\ 
              (exists ps2 : Colour :- 
                 ps2 isin cols /\ ps1 ~= ps2 /\ 
-                (ps1 \ ps2 ~= ps1 \/ ps2 \ ps1 ~= ps2))) 
-    	 
-    test_case 
-      /*[d1] isRelation(Relations) = true,*/
-      [t1]
-        areNb("P2", "P1", relationMap), 
-      [t2]
-        isRelation(relationMap), 
-      [t3]
-        areNb("P1", "P2", relationMap), 
-      [t4]
-        areNb("P1", "P8", relationMap), 
-      [t5]
-        isCorrectColouring(colourSet, relationMap), 
-      [t6]
-        hd (relationMap) 
+                (ps1 \ ps2 ~= ps1 \/ ps2 \ ps1 ~= ps2))) -- Requirement 3
+
   end

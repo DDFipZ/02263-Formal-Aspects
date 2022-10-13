@@ -4,8 +4,6 @@ scheme ColouringEx =
   extend ColouringBasics with 
   class 
     value 
-      empty : Colouring = {}, 
-      
       remove : Piece-set >< Relation -> Relation
       remove((p, r)) is r \ p, 
 
@@ -30,12 +28,6 @@ scheme ColouringEx =
         end, 
       	
       col : Relation -~-> Colouring
-      col(r) is createColouring((empty, r, r)) pre isRelation(r)
-    	 
-    test_case 
-      [t1]
-        col(relationMap),
-      [t2]
-        isCorrectColouring(col(relationMap), relationMap)
-
+      col(r) is createColouring(({}, r, r)) 
+      pre isRelation(r)
   end
