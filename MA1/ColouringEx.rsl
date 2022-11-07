@@ -1,10 +1,33 @@
 ColouringBasics
+	
+scheme ColouringEx = 
+  extend ColouringBasics with 
+  class 
+    value 
+      remove : Piece-set >< Relation -> Relation
+      remove((p, r)) is r \ p, 
 
-scheme ColouringEx =
-extend ColouringBasics with 
-class
-  value
-   col : Relation -~-> Colouring
-   col(r) is ...
-   pre isRelation(r)
-end
+      createColour : Colour >< Piece >< Relation >< Relation -> Colour
+      createColour((c, p, r, rm)) is 
+        if (r = []) then c 
+        else 
+          if ((all ps : Piece :- ps isin c => ~ areNb(ps, p, rm))) 
+          then createColour(c union {p}, hd (r), remove(({p}, r)), rm) 
+          else createColour(c, hd (r), remove(({p}, r)), rm) 
+          end 
+        end, 
+      	
+      createColouring : Colouring >< Relation >< Relation -> Colouring
+      createColouring((cl, r, rm)) is 
+        if (rm = []) then cl 
+        else 
+          createColouring(
+             cl union {createColour({}, hd (r), r, rm)}, 
+             remove((createColour({}, hd (r), r, rm), rm)), 
+             remove((createColour({}, hd (r), r, rm)), rm)) 
+        end, 
+      	
+      col : Relation -~-> Colouring
+      col(r) is createColouring(({}, r, r)) 
+      pre isRelation(r)
+  end

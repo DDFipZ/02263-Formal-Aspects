@@ -1,34 +1,40 @@
-scheme  ColouringBasics =
-class
-  type 
-    Piece = Text,
-    Relation = (Piece >< Piece)-set,
-    Colour = Piece-set,
-    Colouring = Colour-set,
-
-    RelationSet = (Relation)-set
-    
-  value /* auxiliary functions */ 
-
-  RelationList : RelationSet =  (("P1","P2"), ("P1","P3"),
-	   ("P2","P4"), ("P2","P5"),
-	   ("P3","P4"), ("P3","P7"),
-	   ("P4","P5"), ("P4","P6"), ("P4","P7"), ("P4","P8"),
-	   ("P5","P6"), ("P6","P8"), ("P7","P8")),
-  
-  isRelation : Relation -> Bool
-    isRelation(r) is
-    r isin RelationList
-   
-/*
-
-    areNb : Piece >< Piece >< Relation -> Bool
-    areNb(cn1, cn2, r) is ...,
-
-    isCorrectColouring : Colouring >< Relation -> Bool
-    isCorrectColouring(cols, r) is ...,
-
-*/
-test_case
-[t1] isRelation(("P1", "P2")) = true
- end
+scheme ColouringBasics = 
+  class 
+    type 
+      Piece = Text, 
+      Relation = Piece -m-> Piece-set, 
+      Colour = Piece-set, 
+      Colouring = Colour-set 
+    	 
+    value /* auxiliary functions */ 
+      isRelation : Relation -> Bool
+      isRelation(r) is 
+        (all ps : Piece-set :- ps isin rng r => ps <<= dom r) /\ --Requirement 2
+        (all p : Piece :- 
+           p isin dom r => 
+             p ~isin r(p) /\ -- Requirement 1
+             (all pv : Piece :- pv isin r(p) => p isin r(pv)) /\ -- Requirement 3
+             r(p) ~= {}), -- Requirement 4
+      	
+      areNb : Piece >< Piece >< Relation -> Bool
+      areNb(cn1, cn2, r) is cn1 isin r(cn2) pre cn1 isin dom r, 
+      	
+      isCorrectColouring : Colouring >< Relation -> Bool
+      isCorrectColouring(cols, r) is 
+        (all ps : Colour :- 
+           ps isin cols => 
+             (all p1 : Piece :- 
+                p1 isin ps => 
+                  (all p2 : Piece :- 
+                     p2 isin {p | p : Piece :- p isin ps /\ p ~= p1} => 
+                       ~ areNb(p1, p2, r))) /\ ps ~= {}) /\ -- Requirement 1 and 2
+        ~ (exists ps1 : Colour :- 
+             ps1 isin cols /\ 
+             (exists ps2 : Colour :- 
+                ps2 isin cols /\ ps1 ~= ps2 /\ 
+                (ps1 \ ps2 ~= ps1 \/ ps2 \ ps1 ~= ps2))) /\ -- Requirement 3
+        (all pr : Piece :- 
+           pr isin dom r => 
+             (exists cs : Colour :- 
+                cs isin cols /\ (exists pl : Piece :- pl isin cs /\ pr = pl))) -- Requirement 4 
+  end
