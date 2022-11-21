@@ -37,19 +37,19 @@ class
 
     getStop : StopId >< Net -~-> Stop
     getStop(stopid, net) is
-      hd({s | s : Stop :- s isin dom net}),
+      hd({(si, net) | (si, net) : Stop :- (si, net) isin dom net /\ si = stopid}),
 
     -- check whether two stops are directly connected in a network        
     areDirectlyConnected : StopId >< StopId >< Net -> Bool
     areDirectlyConnected(stopid1, stopid2, net) is 
       stopid2 isin {stopid_2 | (stop1, (stopid_2, c2),  c, h, dt) : Connection :- (stop1, (stopid_2, c2), c, h, dt) isin net(getStop(stopid1, net))}
       /\
-      stopid1 isin {stopid_1 | ((stopid_1, c1), stop2,  c, h, dt) : Connection :- ((stopid_1, c1), stop2, c, h, dt) isin net(getStop(stopid2, net))}
+      stopid1 isin {stopid_2 | (stop1, (stopid_2, c2),  c, h, dt) : Connection :- (stop1, (stopid_2, c2), c, h, dt) isin net(getStop(stopid2, net))}
 
 
-  --   -- get minimum headway between two connected stops        
-  --   minHeadway : StopId >< StopId >< Net -~-> Headway
-  --   ..., 
+    -- get minimum headway between two connected stops        
+    minHeadway : StopId >< StopId >< Net -~-> Headway
+    ..., 
 
   --  -- get the capacity for a connection between two connected stops
   --   capacity : StopId >< StopId >< Net -~-> Capacity
@@ -66,19 +66,27 @@ class
 
   -- test values
   value
+    -- Beach <-> Stop <-> Post
     testMap :  Net = [
-      ("Stop", 2) +> {(("Stop", 2), ("Post", 3), 5, 7, 9)},
-      ("Post", 3) +> {(("Post", 3), ("Stop", 2), 5, 7, 9)}
+      ("Stop", 2) +> {
+        (("Stop", 2), ("Post", 3), 5, 7, 9),
+        (("Stop", 2), ("Beach", 4), 6, 8 ,10)
+      },
+      ("Post", 3) +> {(("Post", 3), ("Stop", 2), 5, 7, 9)},
+      ("Beach", 4) +> {(("Beach", 4), ("Stop", 2), 6, 8 ,10)}
       ]
   test_case
-    [isInTest1] isIn("Stawdawdop", testMap),
+    [isInTest1] ~isIn("Stawdawdop", testMap),
     [isInTest2] isIn("Stop", testMap),
 
-    [getCapicity1] capacity("Stop", testMap),
+    [getCapicity1] capacity("Stop", testMap) = 4,
 
-    [getStop1] getStop("Stop", testMap),
+    [getStop1] getStop("Stop", testMap) = ("Stop", 2),
+    [getStop2] getStop("Post", testMap) ~= ("Stop", 2),
 
-    [areDirectlyConnected1] areDirectlyConnected("Stop", "Post", testMap)
+    [areDirectlyConnected1] ~areDirectlyConnected("Post", "Beach", testMap),
+    [areDirectlyConnected2] areDirectlyConnected("Stop", "Beach", testMap)
+
 
     
 end  
