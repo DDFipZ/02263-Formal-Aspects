@@ -10,43 +10,59 @@ class
     Stop = StopId >< Capacity, --Stops
     StopId = Text  -- names of stops
   value /* generators */
-    empty :  Net = ... ,  -- the empty net
+    empty :  Net = []  -- the empty net
 
+    
     -- insert a stop with a given name and capacity 
-    insertStop : StopId >< Capacity >< Net -> Net
-    ...,
+    -- -- Create the Stop object and make it a key to an empty value and return the new Net
+    -- insertStop : StopId >< Capacity >< Net -> Net
+    -- ...,
 
-    -- add a connection between given stops, 
-    -- with the given minimum headway, capacity and minimum driving time
-    addConnection : StopId >< StopId  >< Headway >< Capacity >< DrivingTime >< Net -> Net
-    ... 
+    -- -- add a connection between given stops, 
+    -- -- with the given minimum headway, capacity and minimum driving time
+    -- -- 1. Check if the stops are in the map.
+    -- -- 2. If so add a connection value to each of the stops
+    -- addConnection : StopId >< StopId >< Headway >< Capacity >< DrivingTime >< Net -> Net
+    -- ... 
   value /* observers */
     -- check whether a stop is in a network     
     isIn : StopId >< Net -> Bool
-    ...,
+    isIn(stopid, net) is 
+      (exists (si, capacity) : Stop :- (si, capacity) isin dom net /\ si = stopid),
  
     -- get the capacity of a stop 
     capacity : StopId >< Net -~-> Capacity
-    ...,
+    capacity(stopid, net) is
+      hd({capacity | (si, capacity) : Stop :- (si, capacity) isin dom net})
+
 
     -- check whether two stops are directly connected in a network        
     areDirectlyConnected : StopId >< StopId >< Net -> Bool
-    ...,
+    
 
-    -- get minimum headway between two connected stops        
-    minHeadway : StopId >< StopId >< Net -~-> Headway
-    ..., 
+  --   -- get minimum headway between two connected stops        
+  --   minHeadway : StopId >< StopId >< Net -~-> Headway
+  --   ..., 
 
-   -- get the capacity for a connection between two connected stops
-    capacity : StopId >< StopId >< Net -~-> Capacity
-    ...,
+  --  -- get the capacity for a connection between two connected stops
+  --   capacity : StopId >< StopId >< Net -~-> Capacity
+  --   ...,
  
-    -- get minimum driving time between two connected stops        
-    minDrivingTime : StopId >< StopId >< Net -~-> DrivingTime
-    ...
+  --   -- get minimum driving time between two connected stops        
+  --   minDrivingTime : StopId >< StopId >< Net -~-> DrivingTime
+  --   ...
 
  
-  value /* predicates to check nets */
-    isWellformed : Net -> Bool
-    isWellformed(n) is ...
+  -- value /* predicates to check nets */
+  --   isWellformed : Net -> Bool
+  --   isWellformed(n) is ...
+
+  -- test values
+  value
+    testMap :  Net = [("Stop", 2) +> {(("Stop", 2), ("Post", 3), 5, 7, 9)}]
+  test_case
+    [isInTest1] isIn("Stawdawdop", testMap),
+    [isInTest2] isIn("Stop", testMap),
+
+    [getCapicity] capacity("Stop", testMap)
 end  
