@@ -33,12 +33,19 @@ class
     -- get the capacity of a stop 
     capacity : StopId >< Net -~-> Capacity
     capacity(stopid, net) is
-      hd({capacity | (si, capacity) : Stop :- (si, capacity) isin dom net})
+      hd({capacity | (si, capacity) : Stop :- (si, capacity) isin dom net}),
 
+    getStop : StopId >< Net -~-> Stop
+    getStop(stopid, net) is
+      hd({s | s : Stop :- s isin dom net}),
 
     -- check whether two stops are directly connected in a network        
     areDirectlyConnected : StopId >< StopId >< Net -> Bool
-    
+    areDirectlyConnected(stopid1, stopid2, net) is 
+      stopid2 isin {stopid_2 | (stop1, (stopid_2, c2),  c, h, dt) : Connection :- (stop1, (stopid_2, c2), c, h, dt) isin net(getStop(stopid1, net))}
+      /\
+      stopid1 isin {stopid_1 | ((stopid_1, c1), stop2,  c, h, dt) : Connection :- ((stopid_1, c1), stop2, c, h, dt) isin net(getStop(stopid2, net))}
+
 
   --   -- get minimum headway between two connected stops        
   --   minHeadway : StopId >< StopId >< Net -~-> Headway
@@ -59,10 +66,19 @@ class
 
   -- test values
   value
-    testMap :  Net = [("Stop", 2) +> {(("Stop", 2), ("Post", 3), 5, 7, 9)}]
+    testMap :  Net = [
+      ("Stop", 2) +> {(("Stop", 2), ("Post", 3), 5, 7, 9)},
+      ("Post", 3) +> {(("Post", 3), ("Stop", 2), 5, 7, 9)}
+      ]
   test_case
     [isInTest1] isIn("Stawdawdop", testMap),
     [isInTest2] isIn("Stop", testMap),
 
-    [getCapicity] capacity("Stop", testMap)
+    [getCapicity1] capacity("Stop", testMap),
+
+    [getStop1] getStop("Stop", testMap),
+
+    [areDirectlyConnected1] areDirectlyConnected("Stop", "Post", testMap)
+
+    
 end  
