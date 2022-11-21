@@ -2,8 +2,8 @@ NET
 scheme TIMETABLE = extend NET with
 class
   type 
-    TimeTable ..., -- time tables
-    ...,
+    TimeTable =  Plan-set,
+    Plan = TramId >< (StopId >< Time >< Time)-list,
     TramId = Text -- tram names
 
     value /* generators */
