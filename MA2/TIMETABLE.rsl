@@ -32,13 +32,18 @@ class
       (all plan : Plan :- plan isin rng tt => len(plan) > 0) /\ 
       card(dom tt) > 0
 
-      
+    NoConsecutiveStops : TimeTable -> Bool
+    NoConsecutiveStops
+
+    checkConsecutiveStops : Plan >< (StopId >< Time >< Time) -> Bool
+    checkConsecutiveStops(planlist, plan) is
+    let hd(planlist) 
     
   value /* predicates to check time tables */   
     isWellformed : TimeTable >< Net -~-> Bool
     isWellformed(t, n) is
       isTimetableNotEmpty(t) /\
-      
+
 
   value
     testTt : TimeTable = 
