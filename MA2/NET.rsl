@@ -9,7 +9,6 @@ scheme NET =
       Connection = Stop >< Stop >< Capacity >< Headway >< DrivingTime, 
       Stop = StopId >< Capacity, --Stops
       StopId = Text -- names of stops    
-    	 
     value /* generators */ 
       empty : Net = [], -- the empty net
       -- insert a stop with a given name and capacity 
@@ -148,11 +147,11 @@ scheme NET =
       [areDirectlyConnected2]
         areDirectlyConnected("Stop", "Beach", testMap), 
       [connectionCapicity1]
-        capacity("Stop", "Post", testMap), 
+        capacity("Stop", "Post", testMap) = 5, 
       [minHeadway1]
-        minHeadway("Stop", "Post", testMap), 
+        minHeadway("Stop", "Post", testMap) = 7, 
       [DrivingTime1]
-        minDrivingTime("Stop", "Post", testMap), 
+        minDrivingTime("Stop", "Post", testMap) = 9, 
       [wffTest1]
         isWellformed(testMap), 
       [insertStop1]
