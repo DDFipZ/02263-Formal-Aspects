@@ -1,0 +1,8 @@
+scheme X =
+    class
+        exists
+        test_case
+            [t1] 1+2
+            [t2] true V false
+    end
+

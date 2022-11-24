@@ -35,7 +35,7 @@ scheme NET =
          {(getStop(stopid_2, net), getStop(stopid_1, net), h, c, dt)}] 
     	 
     value /* observers */ 
-    -- check whether a stop is in a network         
+      -- check whether a stop is in a network         
       isIn : StopId >< Net -> Bool
       isIn(stopid, net) is 
         (exists (si, capacity) : Stop :- 
