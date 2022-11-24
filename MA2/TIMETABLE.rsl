@@ -36,12 +36,22 @@ scheme TIMETABLE =
         (all plan : Plan :- plan isin rng tt => len (plan) > 0) /\ 
         card (dom tt) > 0, 
       	
-      arrivalLessThanDep : TimeTable -> Bool
-      arrivalLessThanDep(tt) is 
+      arrivalLessThanDeparture : TimeTable -> Bool
+      arrivalLessThanDeparture(tt) is 
         (all plan : Plan :- 
            plan isin rng tt => 
              (all (stopid, at, dt) : StopId >< Time >< Time :- 
-                (stopid, at, dt) isin plan => at < dt))
+                (stopid, at, dt) isin plan => at < dt)),
+
+      allStopsInPlanExistsInNet: TimeTable>< Net -> Bool
+      allStopsInPlanExistsInNet(tt, n) is
+        (all plan : Plan :- 
+          plan isin rng tt => 
+            (all (stopid, at, dt) : StopId >< Time >< Time :- 
+              (stopid, at, dt) isin plan => isIn(stopid, n)))
+      
+      
+      
     	 
     value /* predicates to check time tables */ 
       isWellformed : TimeTable >< Net -~-> Bool
@@ -51,7 +61,9 @@ scheme TIMETABLE =
       testTt : TimeTable = ["Train1" +> <.("Beach", 0, 5), ("Stop", 5, 10).>], 
       emptyTt : TimeTable = [], 
       noValueTt : TimeTable = ["Train1" +> <..>],
-      noStationTimeTt:TimeTable = ["Train1" +> <.("Beach", 0, 5), ("Stop", 5, 5).>]
+      noStationTimeTt:TimeTable = ["Train1" +> <.("Beach", 0, 5), ("Stop", 5, 5).>],
+      stationNotInNetTt : TimeTable = ["Train1" +> <.("Beach", 0, 5), ("Church", 5, 10).>]
+
     	 
     test_case 
       [addTram]
@@ -69,7 +81,10 @@ scheme TIMETABLE =
       [notEmptyTest3]
         ~ isTimetableNotEmpty(noValueTt),
       [timeInStation1]
-        arrivalLessThanDep(testTt),
+        arrivalLessThanDeparture(testTt),
       [timeInStation2]
-        arrivalLessThanDep(noStationTimeTt)
+        ~arrivalLessThanDeparture(noStationTimeTt),
+      
+      [timeTableStopsInNet2]
+        ~allStopsInPlanExistsInNet(stationNotInNetTt, testMap)
   end
