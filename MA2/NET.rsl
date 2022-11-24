@@ -114,8 +114,7 @@ scheme NET =
         -- test values    
     	 
     value 
-      -- Beach <-> Stop <-> Post
-      testMap : Net = 
+      wellFormedNet : Net = 
         [("Post", 3) +> {(("Post", 3), ("Stop", 2), 5, 7, 9)}, 
          ("Stop", 2) +> 
          {(("Stop", 2), ("Beach", 4), 6, 8, 10), 
@@ -133,29 +132,29 @@ scheme NET =
     	 
     test_case 
       [isInTest1]
-        ~ isIn("Stawdawdop", testMap), 
+        ~ isIn("Stawdawdop", wellFormedNet), 
       [isInTest2]
-        isIn("Stop", testMap), 
+        isIn("Stop", wellFormedNet), 
       [getCapicity1]
-        capacity("Stop", testMap) = 4, 
+        capacity("Stop", wellFormedNet) = 4, 
       [getStop1]
-        getStop("Stop", testMap) = ("Stop", 2), 
+        getStop("Stop", wellFormedNet) = ("Stop", 2), 
       [getStop2]
-        getStop("Post", testMap) ~= ("Stop", 2), 
+        getStop("Post", wellFormedNet) ~= ("Stop", 2), 
       [areDirectlyConnected1]
-        ~ areDirectlyConnected("Post", "Beach", testMap), 
+        ~ areDirectlyConnected("Post", "Beach", wellFormedNet), 
       [areDirectlyConnected2]
-        areDirectlyConnected("Stop", "Beach", testMap), 
+        areDirectlyConnected("Stop", "Beach", wellFormedNet), 
       [connectionCapicity1]
-        capacity("Stop", "Post", testMap) = 5, 
+        capacity("Stop", "Post", wellFormedNet) = 5, 
       [minHeadway1]
-        minHeadway("Stop", "Post", testMap) = 7, 
+        minHeadway("Stop", "Post", wellFormedNet) = 7, 
       [DrivingTime1]
-        minDrivingTime("Stop", "Post", testMap) = 9, 
+        minDrivingTime("Stop", "Post", wellFormedNet) = 9, 
       [wffTest1]
-        isWellformed(testMap), 
+        isWellformed(wellFormedNet), 
       [insertStop1]
-        insertStop("City", 2, testMap), 
+        insertStop("City", 2, wellFormedNet), 
       [addConnection]
-        addConnection("City", "Beach", 1, 2, 3, insertStop("City", 2, testMap)) = addConnectionResult
+        addConnection("City", "Beach", 1, 2, 3, insertStop("City", 2, wellFormedNet)) = addConnectionResult
   end
