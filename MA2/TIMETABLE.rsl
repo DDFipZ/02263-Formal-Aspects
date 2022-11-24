@@ -1,11 +1,10 @@
-e:/fredd/OneDrive/Dokumenter/Master/Sem1/FormalMethods/MA1Real/02263-Formal-Aspects/MA2/NET
+NET
 	
 scheme TIMETABLE = 
   extend NET with 
   class 
     type 
-      TimeTable = TramId -m-> Plan -- the empty timetable
-      , 
+      TimeTable = TramId -m-> Plan, -- the empty timetable
       Plan = 
         (StopId >< Time >< Time) 
         -- add to a time table an empty plan for a new tram
@@ -81,13 +80,14 @@ scheme TIMETABLE =
          "Train2" +> 
          <.("Beach", 0, 5), ("Stop", 5, 10), ("Church", 5, 10), ("Beach", 5, 10)
          .>], 
+
       emptyTt : TimeTable = [], 
       noValueTt : TimeTable = ["Train1" +> <..>], 
       noStationTimeTt : TimeTable = 
         ["Train1" +> <.("Beach", 0, 5), ("Stop", 5, 5).>], 
       stationNotInNetTt : TimeTable = 
         ["Train1" +> <.("Beach", 0, 5), ("Church", 5, 10).>] 
-
+    	 
     test_case 
       [addTram]
         addTram("Train2", testTt), 
