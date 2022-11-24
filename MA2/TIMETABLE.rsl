@@ -1,36 +1,39 @@
-NET
+e:/fredd/OneDrive/Dokumenter/Master/Sem1/FormalMethods/MA1Real/02263-Formal-Aspects/MA2/NET
+	
 scheme TIMETABLE = 
   extend NET with 
   class 
     type 
-      TimeTable = TramId -m-> Plan, 
-      Plan = 
-        (StopId >< Time >< Time)-list /* generators */ 
-        -- the empty timetable
+      TimeTable = TramId -m-> Plan -- the empty timetable
       , 
+      Plan = 
+        (StopId >< Time >< Time) 
+        -- add to a time table an empty plan for a new tram
+        -list, 
       TramId = Text 
     	 
     value 
-      empty 
-      -- add to a time table an empty plan for a new tram
-       : TimeTable = [], 
+      empty : TimeTable = [], 
       	
       addTram : TramId >< TimeTable -> TimeTable
-      addTram(tramid, tt) is tt !! [tramid +> <..>], 
-      	 
-      -- add a stop with arrival time and departure time to the plan for
-      -- a given tram 
+      addTram(tramid, tt) is 
+        tt !! 
+        [tramid 
+         -- add a stop with arrival time and departure time to the plan for
+         -- a given tram 
+          +> <..>], 
+      	
       addStop : TramId >< StopId >< Time >< Time >< TimeTable -> TimeTable
       addStop(tramid, stopid, t1, t2, tt) is 
         tt !! [tramid +> tt(tramid) ^ <.(stopid, t1, t2).>] 
     	 
     value /* observers */ 
     -- check whether a tram with a given name exists in a given time
-    -- table 
+    -- table  
       isIn : TramId >< TimeTable -> Bool
       isIn(tramid, tt) is (exists ti : TramId :- ti isin dom tt /\ ti = tramid), 
       	 
-      -- you can add more observers here 
+      -- you can add more observers here  
       isTimetableNotEmpty : TimeTable -> Bool
       isTimetableNotEmpty(tt) is 
         (all plan : Plan :- plan isin rng tt => len (plan) > 0) /\ 
@@ -41,42 +44,50 @@ scheme TIMETABLE =
         (all plan : Plan :- 
            plan isin rng tt => 
              (all (stopid, at, dt) : StopId >< Time >< Time :- 
-                (stopid, at, dt) isin plan => at < dt)),
-
-    NoConsecutiveStops : TimeTable -> Bool
-    NoConsecutiveStops
-
-    checkConsecutiveStops : Plan >< (StopId >< Time >< Time) -> Bool
-    checkConsecutiveStops(planlist, plan) is
-    let hd(planlist) 
-    
-  value /* predicates to check time tables */   
-    isWellformed : TimeTable >< Net -~-> Bool
-    isWellformed(t, n) is
-      isTimetableNotEmpty(t) /\
-      
-      allStopsInPlanExistsInNet: TimeTable>< Net -> Bool
-      allStopsInPlanExistsInNet(tt, n) is
+                (stopid, at, dt) isin plan => at < dt)), 
+      	
+      allStopsInPlanExistsInNet : TimeTable >< Net -> Bool
+      allStopsInPlanExistsInNet(tt, n) is 
         (all plan : Plan :- 
-          plan isin rng tt => 
-            (all (stopid, at, dt) : StopId >< Time >< Time :- 
-              (stopid, at, dt) isin plan => isIn(stopid, n)))
-      
-      
-      
+           plan isin rng tt => 
+             (all (stopid, at, dt) : StopId >< Time >< Time :- 
+                (stopid, at, dt) isin plan => isIn(stopid, n))), 
+      	
+      NoConsecutiveStops : TimeTable -> Bool
+      NoConsecutiveStops(tt) is 
+        (all tram : TramId :- 
+           tram isin dom tt => checkConsecutiveStops(tt(tram), ("", 0, 0))), 
+      	
+      checkConsecutiveStops : Plan >< (StopId >< Time >< Time) -> Bool
+      checkConsecutiveStops(planlist, (stopid, at, dt)) is 
+        let (stopid1, at1, dt1) = hd (planlist), newlist = tl (planlist) in 
+          if stopid1 = stopid then false 
+          else 
+            if len (newlist) = 0 then true 
+            else checkConsecutiveStops(newlist, (stopid1, at1, dt1)) 
+            end 
+          end 
+        end 
     	 
     value /* predicates to check time tables */ 
       isWellformed : TimeTable >< Net -~-> Bool
       isWellformed(t, n) is isTimetableNotEmpty(t) /\ true 
     	 
     value 
-      testTt : TimeTable = ["Train1" +> <.("Beach", 0, 5), ("Stop", 5, 10).>], 
+      testTt : TimeTable = 
+        ["Train1" +> 
+         <.("Beach", 0, 5), ("Stop", 5, 10), ("Church", 5, 10), ("Beach", 5, 10)
+         .>, 
+         "Train2" +> 
+         <.("Beach", 0, 5), ("Stop", 5, 10), ("Church", 5, 10), ("Beach", 5, 10)
+         .>], 
       emptyTt : TimeTable = [], 
-      noValueTt : TimeTable = ["Train1" +> <..>],
-      noStationTimeTt:TimeTable = ["Train1" +> <.("Beach", 0, 5), ("Stop", 5, 5).>],
-      stationNotInNetTt : TimeTable = ["Train1" +> <.("Beach", 0, 5), ("Church", 5, 10).>]
+      noValueTt : TimeTable = ["Train1" +> <..>], 
+      noStationTimeTt : TimeTable = 
+        ["Train1" +> <.("Beach", 0, 5), ("Stop", 5, 5).>], 
+      stationNotInNetTt : TimeTable = 
+        ["Train1" +> <.("Beach", 0, 5), ("Church", 5, 10).>] 
 
-    	 
     test_case 
       [addTram]
         addTram("Train2", testTt), 
@@ -91,12 +102,13 @@ scheme TIMETABLE =
       [notEmptyTest2]
         ~ isTimetableNotEmpty(emptyTt), 
       [notEmptyTest3]
-        ~ isTimetableNotEmpty(noValueTt),
+        ~ isTimetableNotEmpty(noValueTt), 
       [timeInStation1]
-        arrivalLessThanDeparture(testTt),
+        arrivalLessThanDeparture(testTt), 
       [timeInStation2]
-        ~arrivalLessThanDeparture(noStationTimeTt),
-      
+        ~ arrivalLessThanDeparture(noStationTimeTt), 
       [timeTableStopsInNet2]
-        ~allStopsInPlanExistsInNet(stationNotInNetTt, testMap)
+        ~ allStopsInPlanExistsInNet(stationNotInNetTt, testMap), 
+      [consecutiveStops]
+        NoConsecutiveStops(testTt) 
   end
