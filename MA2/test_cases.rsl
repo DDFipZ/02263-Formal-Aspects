@@ -1,0 +1,135 @@
+TIMETABLE
+	
+scheme test_cases = 
+  extend TIMETABLE with 
+  class
+-------------- Network values and test cases --------------
+    value
+        wellFormedNet1 : Net = 
+            [
+            ("A", 2) +> {(("A", 2), ("B", 6), 1, 1, 10)},
+            ("B", 6) +> {
+                (("B", 6), ("A", 2), 1, 1, 10),
+                (("B", 6), ("C", 2), 2, 3, 12),
+                (("B", 6), ("D", 2), 2, 2, 7)
+                },
+            ("C", 2) +> {
+                (("C", 2), ("B", 6), 2, 3, 12)
+                },
+            ("D",2) +> {
+                (("D", 2), ("B", 6), 2, 2, 7)
+                }
+            ],
+        
+        
+        wellFormedNet2 : Net = 
+            [
+            ("A", 2) +> {(("A", 2), ("B", 6), 1, 1, 10)},
+            ("B", 6) +> {
+                (("B", 6), ("A", 2), 1, 1, 10),
+                (("B", 6), ("C", 2), 2, 3, 12),
+                (("B", 6), ("D", 2), 2, 2, 7)
+                },
+            ("C", 2) +> {
+                (("C", 2), ("B", 6), 2, 3, 12),
+                (("C", 2), ("E", 3), 1, 1, 5),
+                (("C", 2), ("F", 2), 1, 1, 6)
+                },
+            ("D",2) +> {
+                (("D", 2), ("B", 6), 2, 2, 7),
+                (("D", 2), ("H", 2), 1, 1, 6)
+                },
+            ("H",2) +> {
+                (("H", 2), ("D", 2), 1, 1, 6)
+            },
+            ("E", 3) +> {
+                (("E", 3), ("C", 2), 1, 1, 5),
+                (("E", 3), ("G", 3), 2, 2, 7)
+                },
+            ("G", 3) +> {
+                (("G", 3), ("E", 3), 2, 2, 7),
+                (("G", 3), ("F", 2), 1, 1, 6)
+                },
+                ("F",2) +> {
+                (("F", 2), ("G", 3), 1, 1, 6)
+            }
+            ],
+        emptyNet : Net = [],
+        WfNet1_noD : Net = 
+            [
+            ("A", 2) +> {(("A", 2), ("B", 6), 1, 1, 10)},
+            ("B", 6) +> {
+                (("B", 6), ("A", 2), 1, 1, 10),
+                (("B", 6), ("C", 2), 2, 3, 12)
+                },
+            ("C", 2) +> {
+                (("C", 2), ("B", 6), 2, 3, 12)
+                }
+            ]
+        
+    test_case
+    [isInTest1]
+        ~ isIn("Stawdawdop", wellFormedNet1),
+      [isInTest2]
+        isIn("Stop", wellFormedNet1), 
+      [getCapicity1]
+        capacity("Stop", wellFormedNet1) = 4, 
+      [getStop1]
+        getStop("Stop", wellFormedNet1) = ("Stop", 2), 
+      [getStop2]
+        getStop("Post", wellFormedNet1) ~= ("Stop", 2), 
+      [areDirectlyConnected1]
+        ~ areDirectlyConnected("Post", "Beach", wellFormedNet1), 
+      [areDirectlyConnected2]
+        areDirectlyConnected("Stop", "Beach", wellFormedNet1), 
+      [connectionCapicity1]
+        capacity("Stop", "Post", wellFormedNet1) = 5, 
+      [minHeadway1]
+        minHeadway("Stop", "Post", wellFormedNet1) = 7, 
+      [DrivingTime1]
+        minDrivingTime("Stop", "Post", wellFormedNet1) = 9, 
+      [wffTest1]
+        isWellformed(wellFormedNet1), 
+      [insertStop1]
+        insertStop("City", 2, wellFormedNet1), 
+      [addConnection]
+        addConnection("City", "Beach", 1, 2, 3, insertStop("City", 2, wellFormedNet1)) = wellFormedNet1
+            
+-------------- TimeTable values and test cases --------------
+    value 
+      wellFormedTt1 : TimeTable = 
+        ["Train1" +> <.("Beach", 0, 5), ("Stop", 5, 10), ("Church", 5, 10), ("Beach", 5, 10).>, 
+         "Train2" +> <.("Beach", 0, 5), ("Stop", 5, 10), ("Church", 5, 10), ("Beach", 5, 10).>
+        
+         ], 
+      emptyTt : TimeTable = [], 
+      noValueTt : TimeTable = ["Train1" +> <..>], -- timetable with no
+      noStationTimeTt : TimeTable = 
+        ["Train1" +> <.("Beach", 0, 5), ("Stop", 5, 5).>], 
+      stationNotInNetTt : TimeTable = 
+        ["Train1" +> <.("Beach", 0, 5), ("Church", 5, 10).>] 
+    	 
+    test_case 
+      [addTram]
+        addTram("Train2", wellFormedTt1), 
+      [addStop]
+        addStop("Train1", "Post", 6, 11, wellFormedTt1), 
+      [isIn1]
+        isIn("Train1", wellFormedTt1), 
+      [isIn2]
+        ~ isIn("Train3", wellFormedTt1), 
+      [notEmptyTest1]
+        isTimetableNotEmpty(wellFormedTt1), 
+      [notEmptyTest2]
+        ~ isTimetableNotEmpty(emptyTt), 
+      [notEmptyTest3]
+        ~ isTimetableNotEmpty(noValueTt), 
+      [timeInStation1]
+        arrivalLessThanDeparture(wellFormedTt1), 
+      [timeInStation2]
+        ~ arrivalLessThanDeparture(noStationTimeTt), 
+      [timeTableStopsInNet2]
+        ~ allStopsInPlanExistsInNet(stationNotInNetTt, wellFormedNet1), 
+      [consecutiveStops]
+        NoConsecutiveStops(wellFormedTt1) 
+  end

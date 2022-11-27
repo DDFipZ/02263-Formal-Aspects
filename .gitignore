@@ -1,2 +1,5 @@
 *.sml
 *.rsl.el
+
+# ide
+.vscode/

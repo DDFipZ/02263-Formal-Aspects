@@ -112,50 +112,7 @@ scheme NET =
                 (stop1, (stopid_2, c2), c, h, dt) isin n(getStop(id, n)) => 
                   areDirectlyConnected(id, stopid_2, n))) -- Requirement 1: Net connections needs to be symmetrical    
         -- test values    
+
     	 
-    value 
-      -- Beach <-> Stop <-> Post
-      testMap : Net = 
-        [("Post", 3) +> {(("Post", 3), ("Stop", 2), 5, 7, 9)}, 
-         ("Stop", 2) +> 
-         {(("Stop", 2), ("Beach", 4), 6, 8, 10), 
-          (("Stop", 2), ("Post", 3), 5, 7, 9)}, 
-         ("Beach", 4) +> {(("Beach", 4), ("Stop", 2), 6, 8, 10)}], 
-      addConnectionResult : Net = 
-        [("Stop", 2) +> 
-         {(("Stop", 2), ("Post", 3), 5, 7, 9), 
-          (("Stop", 2), ("Beach", 4), 6, 8, 10)}, 
-         ("Post", 3) +> {(("Post", 3), ("Stop", 2), 5, 7, 9)}, 
-         ("Beach", 4) +> 
-         {(("Beach", 4), ("Stop", 2), 6, 8, 10), 
-          (("Beach", 4), ("City", 2), 1, 2, 3)}, 
-         ("City", 2) +> {(("City", 2), ("Beach", 4), 1, 2, 3)}] 
-    	 
-    test_case 
-      [isInTest1]
-        ~ isIn("Stawdawdop", testMap), 
-      [isInTest2]
-        isIn("Stop", testMap), 
-      [getCapicity1]
-        capacity("Stop", testMap) = 4, 
-      [getStop1]
-        getStop("Stop", testMap) = ("Stop", 2), 
-      [getStop2]
-        getStop("Post", testMap) ~= ("Stop", 2), 
-      [areDirectlyConnected1]
-        ~ areDirectlyConnected("Post", "Beach", testMap), 
-      [areDirectlyConnected2]
-        areDirectlyConnected("Stop", "Beach", testMap), 
-      [connectionCapicity1]
-        capacity("Stop", "Post", testMap) = 5, 
-      [minHeadway1]
-        minHeadway("Stop", "Post", testMap) = 7, 
-      [DrivingTime1]
-        minDrivingTime("Stop", "Post", testMap) = 9, 
-      [wffTest1]
-        isWellformed(testMap), 
-      [insertStop1]
-        insertStop("City", 2, testMap), 
-      [addConnection]
-        addConnection("City", "Beach", 1, 2, 3, insertStop("City", 2, testMap)) = addConnectionResult
+
   end
