@@ -112,49 +112,7 @@ scheme NET =
                 (stop1, (stopid_2, c2), c, h, dt) isin n(getStop(id, n)) => 
                   areDirectlyConnected(id, stopid_2, n))) -- Requirement 1: Net connections needs to be symmetrical    
         -- test values    
+
     	 
-    value 
-      wellFormedNet : Net = 
-        [("Post", 3) +> {(("Post", 3), ("Stop", 2), 5, 7, 9)}, 
-         ("Stop", 2) +> 
-         {(("Stop", 2), ("Beach", 4), 6, 8, 10), 
-          (("Stop", 2), ("Post", 3), 5, 7, 9)}, 
-         ("Beach", 4) +> {(("Beach", 4), ("Stop", 2), 6, 8, 10)}], 
-      addConnectionResult : Net = 
-        [("Stop", 2) +> 
-         {(("Stop", 2), ("Post", 3), 5, 7, 9), 
-          (("Stop", 2), ("Beach", 4), 6, 8, 10)}, 
-         ("Post", 3) +> {(("Post", 3), ("Stop", 2), 5, 7, 9)}, 
-         ("Beach", 4) +> 
-         {(("Beach", 4), ("Stop", 2), 6, 8, 10), 
-          (("Beach", 4), ("City", 2), 1, 2, 3)}, 
-         ("City", 2) +> {(("City", 2), ("Beach", 4), 1, 2, 3)}] 
-    	 
-    test_case 
-      [isInTest1]
-        ~ isIn("Stawdawdop", wellFormedNet), 
-      [isInTest2]
-        isIn("Stop", wellFormedNet), 
-      [getCapicity1]
-        capacity("Stop", wellFormedNet) = 4, 
-      [getStop1]
-        getStop("Stop", wellFormedNet) = ("Stop", 2), 
-      [getStop2]
-        getStop("Post", wellFormedNet) ~= ("Stop", 2), 
-      [areDirectlyConnected1]
-        ~ areDirectlyConnected("Post", "Beach", wellFormedNet), 
-      [areDirectlyConnected2]
-        areDirectlyConnected("Stop", "Beach", wellFormedNet), 
-      [connectionCapicity1]
-        capacity("Stop", "Post", wellFormedNet) = 5, 
-      [minHeadway1]
-        minHeadway("Stop", "Post", wellFormedNet) = 7, 
-      [DrivingTime1]
-        minDrivingTime("Stop", "Post", wellFormedNet) = 9, 
-      [wffTest1]
-        isWellformed(wellFormedNet), 
-      [insertStop1]
-        insertStop("City", 2, wellFormedNet), 
-      [addConnection]
-        addConnection("City", "Beach", 1, 2, 3, insertStop("City", 2, wellFormedNet)) = addConnectionResult
+
   end

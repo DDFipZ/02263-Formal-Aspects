@@ -69,31 +69,31 @@ scheme test_cases =
         
     test_case
     [isInTest1]
-        ~ isIn("Stawdawdop", wellFormedNet),
+        ~ isIn("Stawdawdop", wellFormedNet1),
       [isInTest2]
-        isIn("Stop", wellFormedNet), 
+        isIn("Stop", wellFormedNet1), 
       [getCapicity1]
-        capacity("Stop", wellFormedNet) = 4, 
+        capacity("Stop", wellFormedNet1) = 4, 
       [getStop1]
-        getStop("Stop", wellFormedNet) = ("Stop", 2), 
+        getStop("Stop", wellFormedNet1) = ("Stop", 2), 
       [getStop2]
-        getStop("Post", wellFormedNet) ~= ("Stop", 2), 
+        getStop("Post", wellFormedNet1) ~= ("Stop", 2), 
       [areDirectlyConnected1]
-        ~ areDirectlyConnected("Post", "Beach", wellFormedNet), 
+        ~ areDirectlyConnected("Post", "Beach", wellFormedNet1), 
       [areDirectlyConnected2]
-        areDirectlyConnected("Stop", "Beach", wellFormedNet), 
+        areDirectlyConnected("Stop", "Beach", wellFormedNet1), 
       [connectionCapicity1]
-        capacity("Stop", "Post", wellFormedNet) = 5, 
+        capacity("Stop", "Post", wellFormedNet1) = 5, 
       [minHeadway1]
-        minHeadway("Stop", "Post", wellFormedNet) = 7, 
+        minHeadway("Stop", "Post", wellFormedNet1) = 7, 
       [DrivingTime1]
-        minDrivingTime("Stop", "Post", wellFormedNet) = 9, 
+        minDrivingTime("Stop", "Post", wellFormedNet1) = 9, 
       [wffTest1]
-        isWellformed(wellFormedNet), 
+        isWellformed(wellFormedNet1), 
       [insertStop1]
-        insertStop("City", 2, wellFormedNet), 
+        insertStop("City", 2, wellFormedNet1), 
       [addConnection]
-        addConnection("City", "Beach", 1, 2, 3, insertStop("City", 2, wellFormedNet)) = addConnectionResult
+        addConnection("City", "Beach", 1, 2, 3, insertStop("City", 2, wellFormedNet1)) = wellFormedNet1
             
 -------------- TimeTable values and test cases --------------
     value 
@@ -129,7 +129,7 @@ scheme test_cases =
       [timeInStation2]
         ~ arrivalLessThanDeparture(noStationTimeTt), 
       [timeTableStopsInNet2]
-        ~ allStopsInPlanExistsInNet(stationNotInNetTt, wellFormedNet), 
+        ~ allStopsInPlanExistsInNet(stationNotInNetTt, wellFormedNet1), 
       [consecutiveStops]
         NoConsecutiveStops(wellFormedTt1) 
   end
