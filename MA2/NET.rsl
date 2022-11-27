@@ -86,7 +86,7 @@ scheme NET =
           hd ({h | 
                (stop1, (stopid_2, c2), c, h, dt) : Connection :- 
                  (stop1, (stopid_2, c2), c, h, dt) isin 
-                   net(getStop(stopid2, net))}) 
+                   net(getStop(stopid2, net))  /\ stopid_2 = stopid1}) 
         else 0 
         end, 
       	 
@@ -99,7 +99,7 @@ scheme NET =
           hd ({c | 
                (stop1, (stopid_2, c2), c, h, dt) : Connection :- 
                  (stop1, (stopid_2, c2), c, h, dt) isin 
-                   net(getStop(stopid2, net))}) 
+                   net(getStop(stopid2, net)) /\ stopid_2 = stopid1}) 
         else 0 
         end, 
       	 
@@ -112,7 +112,7 @@ scheme NET =
           hd ({dt | 
                (stop1, (stopid_2, c2), c, h, dt) : Connection :- 
                  (stop1, (stopid_2, c2), c, h, dt) isin 
-                   net(getStop(stopid2, net))}) 
+                   net(getStop(stopid2, net)) /\ stopid_2 = stopid1}) 
         else 0 
         end, 
       	 
