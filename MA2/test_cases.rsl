@@ -13,34 +13,42 @@ value
   stopB_capacity : Capacity = 6,
   stopB : Stop = (stopB_id, stopB_capacity),
 
-  connAB_capacity : Capacity = 1,
-  connAB_head : Headway = 1,
-  connAB_driveT : DrivingTime = 10,
-  
+  stopC_id : StopId = "C",
+  stopC_capacity : Capacity = 2,
+  stopC : Stop = (stopC_id, stopC_capacity),
+
   stopD_id : StopId = "D",
   stopD_capacity : Capacity = 2,
   stopD : Stop = (stopD_id, stopD_capacity),
 
-  connBD_head : Headway = 2,
+  connAB_capacity : Capacity = 1,
+  connAB_head : Headway = 1,
+  connAB_driveT : DrivingTime = 10,
+
+  connBC_capacity : Capacity = 3,
+  connBC_head : Headway = 2,
+  connBC_driveT : DrivingTime = 12,
+
   connBD_capacity : Capacity = 2,
+  connBD_head : Headway = 2,
   connBD_driveT : DrivingTime = 7,
 
   wellFormedNet1 : Net = 
     -- Capacity, Headway, DriveTime
   [
-    ("A", 2) +> {
-      (("A", 2), ("B", 6), 1, 1, 10)
+    stopA +> {
+      (stopA, stopB, connAB_capacity ,connAB_head ,connAB_driveT)
       },
-    ("B", 6) +> {
-      (("B", 6), ("A", 2), 1, 1, 10),
-      (("B", 6), ("C", 2), 2, 3, 12),
-      (("B", 6), ("D", 2), 2, 2, 7)
+    stopB +> {
+      (stopB, stopA, connAB_capacity ,connAB_head ,connAB_driveT),
+      (stopB, stopC, connBC_capacity ,connBC_head ,connBC_driveT),
+      (stopB, stopD, connBD_capacity ,connBD_head ,connBD_driveT)
       },
-    ("C", 2) +> {
-      (("C", 2), ("B", 6), 2, 3, 12)
+    stopC +> {
+      (stopC, stopB, connBC_capacity ,connBC_head ,connBC_driveT)
       },
-    ("D", 2) +> {
-      (("D", 2), ("B", 6), 2, 2, 7)
+    stopD +> {
+      (stopD, stopB, connBD_capacity ,connBD_head ,connBD_driveT)
       }
   ],
   
@@ -50,12 +58,12 @@ value
       ("A", 2) +> {
         (("A", 2), ("B", 6), 1, 1, 10)},
       ("B", 6) +> {
-      (("B", 6), ("A", 2), 1, 1, 10),
-      (("B", 6), ("C", 2), 2, 3, 12),
-      (("B", 6), ("D", 2), 2, 2, 7)
+        (("B", 6), ("A", 2), 1, 1, 10),
+        (("B", 6), ("C", 2), 3, 2, 12),
+        (("B", 6), ("D", 2), 2, 2, 7)
       },
       ("C", 2) +> {
-      (("C", 2), ("B", 6), 2, 3, 12),
+      (("C", 2), ("B", 6), 3, 2, 12),
       (("C", 2), ("E", 3), 1, 1, 5),
       (("C", 2), ("F", 2), 1, 1, 6)
       },
@@ -95,11 +103,11 @@ value
 test_case
   -- Net Observer functions
   [isIn_existingStop]
-    isIn(stopA_id, wellFormedNet1) = true, -- unchecked
+    isIn(stopA_id, wellFormedNet1) = true,
   [isIn_nonExistingStop]
-    isIn("Zzz", wellFormedNet1) = false, -- unchecked
+    isIn("Zzz", wellFormedNet1) = false,
   [capacity_existingStop] 
-    capacity(stopA_id, wellFormedNet1) = 2, -- unchecked
+    capacity(stopA_id, wellFormedNet1) = 2,
   [capacity_nonExistingStop]
     capacity("Zzz", wellFormedNet1) = 0, -- unchecked TODO: What should this return? how do you check chaos?
   [getStop_existingStop]
@@ -107,21 +115,21 @@ test_case
   [getStop_nonExistingStop]
     getStop("Zzz", wellFormedNet1) ~= stopA, -- unchecked TODO: same as capacity_nonExistingStop
   [areDirectlyConnected_connectedStops]
-    areDirectlyConnected("A", "B", wellFormedNet1) = true,  -- unchecked
+    areDirectlyConnected(stopA_id, stopB_id, wellFormedNet1) = true,  -- unchecked
   [areDirectlyConnected_notConnectedStops]
-    areDirectlyConnected("A", "C", wellFormedNet1) = false,  -- unchecked
+    areDirectlyConnected(stopA_id, stopC_id, wellFormedNet1) = false,  -- unchecked
   [connectionCapicity_existingConn]
-    capacity("B", "C", wellFormedNet1) = 3,  -- unchecked
+    capacity(stopB_id, stopC_id, wellFormedNet1) = 3,  -- unchecked
   [connectionCapicity_nonExistingConn]
-    capacity("A", "D", wellFormedNet1) = 0,  -- unchecked TODO: What should this return?
+    capacity(stopA_id, stopD_id, wellFormedNet1) = 0,  -- unchecked TODO: What should this return?
   [minHeadway_existingConn]
-    minHeadway("A", "B", wellFormedNet1) = 1,  -- unchecked
+    minHeadway(stopA_id, stopB_id, wellFormedNet1) = 1,  -- unchecked
   [minHeadway_nonExistingConn]
-    minHeadway("A", "D", wellFormedNet1) = 0,  -- unchecked TODO: Same as conn_capacity
+    minHeadway(stopA_id, stopD_id, wellFormedNet1) = 0,  -- unchecked TODO: Same as conn_capacity
   [DrivingTime1_existingConn]
-    minDrivingTime("B", "D", wellFormedNet1) = 7,  -- unchecked
+    minDrivingTime(stopB_id, stopD_id, wellFormedNet1) = 7,  -- unchecked
   [DrivingTime_nonExistingConn]
-    minDrivingTime("A", "C", wellFormedNet1) = 0,  -- unchecked TODO: Same as conn_capacity
+    minDrivingTime(stopA_id, stopC_id, wellFormedNet1) = 0,  -- unchecked TODO: Same as conn_capacity
 
   -- Net generator functions
   [insertStop_newStop]
