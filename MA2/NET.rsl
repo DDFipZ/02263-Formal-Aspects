@@ -61,8 +61,6 @@ scheme NET =
       getStop(stopid, net) is
         hd(getStopSet(stopid, net)) 
         pre getStopSet(stopid, net) ~= {},
-      
-      
       	 
       -- check whether two stops are directly connected in a network  
       --          
