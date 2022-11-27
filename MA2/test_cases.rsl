@@ -1,135 +1,179 @@
 TIMETABLE
-	
+
 scheme test_cases = 
-  extend TIMETABLE with 
-  class
+extend TIMETABLE with 
+class
 -------------- Network values and test cases --------------
-    value
-        wellFormedNet1 : Net = 
-            [
-            ("A", 2) +> {(("A", 2), ("B", 6), 1, 1, 10)},
-            ("B", 6) +> {
-                (("B", 6), ("A", 2), 1, 1, 10),
-                (("B", 6), ("C", 2), 2, 3, 12),
-                (("B", 6), ("D", 2), 2, 2, 7)
-                },
-            ("C", 2) +> {
-                (("C", 2), ("B", 6), 2, 3, 12)
-                },
-            ("D",2) +> {
-                (("D", 2), ("B", 6), 2, 2, 7)
-                }
-            ],
-        
-        
-        wellFormedNet2 : Net = 
-            [
-            ("A", 2) +> {(("A", 2), ("B", 6), 1, 1, 10)},
-            ("B", 6) +> {
-                (("B", 6), ("A", 2), 1, 1, 10),
-                (("B", 6), ("C", 2), 2, 3, 12),
-                (("B", 6), ("D", 2), 2, 2, 7)
-                },
-            ("C", 2) +> {
-                (("C", 2), ("B", 6), 2, 3, 12),
-                (("C", 2), ("E", 3), 1, 1, 5),
-                (("C", 2), ("F", 2), 1, 1, 6)
-                },
-            ("D",2) +> {
-                (("D", 2), ("B", 6), 2, 2, 7),
-                (("D", 2), ("H", 2), 1, 1, 6)
-                },
-            ("H",2) +> {
-                (("H", 2), ("D", 2), 1, 1, 6)
-            },
-            ("E", 3) +> {
-                (("E", 3), ("C", 2), 1, 1, 5),
-                (("E", 3), ("G", 3), 2, 2, 7)
-                },
-            ("G", 3) +> {
-                (("G", 3), ("E", 3), 2, 2, 7),
-                (("G", 3), ("F", 2), 1, 1, 6)
-                },
-                ("F",2) +> {
-                (("F", 2), ("G", 3), 1, 1, 6)
-            }
-            ],
-        emptyNet : Net = [],
-        WfNet1_noD : Net = 
-            [
-            ("A", 2) +> {(("A", 2), ("B", 6), 1, 1, 10)},
-            ("B", 6) +> {
-                (("B", 6), ("A", 2), 1, 1, 10),
-                (("B", 6), ("C", 2), 2, 3, 12)
-                },
-            ("C", 2) +> {
-                (("C", 2), ("B", 6), 2, 3, 12)
-                }
-            ]
-        
-    test_case
-    [isInTest1]
-        ~ isIn("Stawdawdop", wellFormedNet1),
-      [isInTest2]
-        isIn("Stop", wellFormedNet1), 
-      [getCapicity1]
-        capacity("Stop", wellFormedNet1) = 4, 
-      [getStop1]
-        getStop("Stop", wellFormedNet1) = ("Stop", 2), 
-      [getStop2]
-        getStop("Post", wellFormedNet1) ~= ("Stop", 2), 
-      [areDirectlyConnected1]
-        ~ areDirectlyConnected("Post", "Beach", wellFormedNet1), 
-      [areDirectlyConnected2]
-        areDirectlyConnected("Stop", "Beach", wellFormedNet1), 
-      [connectionCapicity1]
-        capacity("Stop", "Post", wellFormedNet1) = 5, 
-      [minHeadway1]
-        minHeadway("Stop", "Post", wellFormedNet1) = 7, 
-      [DrivingTime1]
-        minDrivingTime("Stop", "Post", wellFormedNet1) = 9, 
-      [wffTest1]
-        isWellformed(wellFormedNet1), 
-      [insertStop1]
-        insertStop("City", 2, wellFormedNet1), 
-      [addConnection]
-        addConnection("City", "Beach", 1, 2, 3, insertStop("City", 2, wellFormedNet1)) = wellFormedNet1
-            
+value
+  stopA_id : StopId = "A",
+  stopA_capacity : Capacity = 2,
+  stopA : Stop = (stopA_id, stopA_capacity),
+
+  stopB_id : StopId = "B",
+  stopB_capacity : Capacity = 6,
+  stopB : Stop = (stopB_id, stopB_capacity),
+
+  connAB_capacity : Capacity = 1,
+  connAB_head : Headway = 1,
+  connAB_driveT : DrivingTime = 10,
+  
+  stopD_id : StopId = "D",
+  stopD_capacity : Capacity = 2,
+  stopD : Stop = (stopD_id, stopD_capacity),
+
+  connBD_head : Headway = 2,
+  connBD_capacity : Capacity = 2,
+  connBD_driveT : DrivingTime = 7,
+
+  wellFormedNet1 : Net = 
+    -- Capacity, Headway, DriveTime
+  [
+    ("A", 2) +> {
+      (("A", 2), ("B", 6), 1, 1, 10)
+      },
+    ("B", 6) +> {
+      (("B", 6), ("A", 2), 1, 1, 10),
+      (("B", 6), ("C", 2), 2, 3, 12),
+      (("B", 6), ("D", 2), 2, 2, 7)
+      },
+    ("C", 2) +> {
+      (("C", 2), ("B", 6), 2, 3, 12)
+      },
+    ("D", 2) +> {
+      (("D", 2), ("B", 6), 2, 2, 7)
+      }
+  ],
+  
+
+  wellFormedNet2 : Net = 
+    [
+      ("A", 2) +> {
+        (("A", 2), ("B", 6), 1, 1, 10)},
+      ("B", 6) +> {
+      (("B", 6), ("A", 2), 1, 1, 10),
+      (("B", 6), ("C", 2), 2, 3, 12),
+      (("B", 6), ("D", 2), 2, 2, 7)
+      },
+      ("C", 2) +> {
+      (("C", 2), ("B", 6), 2, 3, 12),
+      (("C", 2), ("E", 3), 1, 1, 5),
+      (("C", 2), ("F", 2), 1, 1, 6)
+      },
+      ("D", 2) +> {
+      (("D", 2), ("B", 6), 2, 2, 7),
+      (("D", 2), ("H", 2), 1, 1, 6)
+      },
+      ("H", 2) +> {
+        (("H", 2), ("D", 2), 1, 1, 6)
+        },
+      ("E", 3) +> {
+      (("E", 3), ("C", 2), 1, 1, 5),
+      (("E", 3), ("G", 3), 2, 2, 7)
+      },
+      ("G", 3) +> {
+        (("G", 3), ("E", 3), 2, 2, 7),
+        (("G", 3), ("F", 2), 1, 1, 6)
+        },
+      ("F", 2) +> {
+      (("F", 2), ("G", 3), 1, 1, 6)
+      }
+    ],
+  emptyNet : Net = [],
+  WfNet1_noD : Net = 
+    [
+      ("A", 2) +> {
+        (("A", 2), ("B", 6), 1, 1, 10)},
+      ("B", 6) +> {
+        (("B", 6), ("A", 2), 1, 1, 10),
+        (("B", 6), ("C", 2), 2, 3, 12)
+        },
+      ("C", 2) +> {
+        (("C", 2), ("B", 6), 2, 3, 12)
+        }
+    ]
+
+test_case
+  -- Net Observer functions
+  [isIn_existingStop]
+    isIn(stopA_id, wellFormedNet1) = true, -- unchecked
+  [isIn_nonExistingStop]
+    isIn("Zzz", wellFormedNet1) = false, -- unchecked
+  [capacity_existingStop] 
+    capacity(stopA_id, wellFormedNet1) = 2, -- unchecked
+  [capacity_nonExistingStop]
+    capacity("Zzz", wellFormedNet1) = 0, -- unchecked TODO: What should this return? how do you check chaos?
+  [getStop_existingStop]
+    getStop(stopA_id, wellFormedNet1) = stopA, -- unchecked  
+  [getStop_nonExistingStop]
+    getStop("Zzz", wellFormedNet1) ~= stopA, -- unchecked TODO: same as capacity_nonExistingStop
+  [areDirectlyConnected_connectedStops]
+    areDirectlyConnected("A", "B", wellFormedNet1) = true,  -- unchecked
+  [areDirectlyConnected_notConnectedStops]
+    areDirectlyConnected("A", "C", wellFormedNet1) = false,  -- unchecked
+  [connectionCapicity_existingConn]
+    capacity("B", "C", wellFormedNet1) = 3,  -- unchecked
+  [connectionCapicity_nonExistingConn]
+    capacity("A", "D", wellFormedNet1) = 0,  -- unchecked TODO: What should this return?
+  [minHeadway_existingConn]
+    minHeadway("A", "B", wellFormedNet1) = 1,  -- unchecked
+  [minHeadway_nonExistingConn]
+    minHeadway("A", "D", wellFormedNet1) = 0,  -- unchecked TODO: Same as conn_capacity
+  [DrivingTime1_existingConn]
+    minDrivingTime("B", "D", wellFormedNet1) = 7,  -- unchecked
+  [DrivingTime_nonExistingConn]
+    minDrivingTime("A", "C", wellFormedNet1) = 0,  -- unchecked TODO: Same as conn_capacity
+
+  -- Net generator functions
+  [insertStop_newStop]
+    insertStop(stopD_id, stopD_capacity, WfNet1_noD) = wellFormedNet1,  -- unchecked
+  [insertStop_existingStop]
+    insertStop(stopD_id, stopD_capacity, wellFormedNet1) = wellFormedNet1,  -- unchecked
+  [addConnection_newConn]
+    addConnection(stopB_id, stopD_id, connBD_head, connBD_capacity, connBD_driveT, insertStop(stopD_id, stopD_capacity, WfNet1_noD)) = wellFormedNet1, -- unchecked
+  [addConnection_existingConn]
+    addConnection(stopB_id, stopD_id, connBD_head, connBD_capacity, connBD_driveT, wellFormedNet1) = wellFormedNet1,
+  [addConnection_nonExistingStop]
+  addConnection("Zzz", stopD_id, 0, 0, 0, wellFormedNet1) = wellFormedNet1, -- unchecked TODO: What happens here?
+  
+  -- Well formed tests  
+  [wffTest1]
+    isWellformed(wellFormedNet1)  -- unchecked
+
 -------------- TimeTable values and test cases --------------
-    value 
-      wellFormedTt1 : TimeTable = 
-        ["Train1" +> <.("Beach", 0, 5), ("Stop", 5, 10), ("Church", 5, 10), ("Beach", 5, 10).>, 
-         "Train2" +> <.("Beach", 0, 5), ("Stop", 5, 10), ("Church", 5, 10), ("Beach", 5, 10).>
-        
-         ], 
-      emptyTt : TimeTable = [], 
-      noValueTt : TimeTable = ["Train1" +> <..>], -- timetable with no
-      noStationTimeTt : TimeTable = 
-        ["Train1" +> <.("Beach", 0, 5), ("Stop", 5, 5).>], 
-      stationNotInNetTt : TimeTable = 
-        ["Train1" +> <.("Beach", 0, 5), ("Church", 5, 10).>] 
-    	 
-    test_case 
-      [addTram]
-        addTram("Train2", wellFormedTt1), 
-      [addStop]
-        addStop("Train1", "Post", 6, 11, wellFormedTt1), 
-      [isIn1]
-        isIn("Train1", wellFormedTt1), 
-      [isIn2]
-        ~ isIn("Train3", wellFormedTt1), 
-      [notEmptyTest1]
-        isTimetableNotEmpty(wellFormedTt1), 
-      [notEmptyTest2]
-        ~ isTimetableNotEmpty(emptyTt), 
-      [notEmptyTest3]
-        ~ isTimetableNotEmpty(noValueTt), 
-      [timeInStation1]
-        arrivalLessThanDeparture(wellFormedTt1), 
-      [timeInStation2]
-        ~ arrivalLessThanDeparture(noStationTimeTt), 
-      [timeTableStopsInNet2]
-        ~ allStopsInPlanExistsInNet(stationNotInNetTt, wellFormedNet1), 
-      [consecutiveStops]
-        NoConsecutiveStops(wellFormedTt1) 
-  end
+value 
+  wellFormedTt1 : TimeTable = 
+  ["Train1" +> <.("Beach", 0, 5), ("Stop", 5, 10), ("Church", 5, 10), ("Beach", 5, 10).>, 
+  "Train2" +> <.("Beach", 0, 5), ("Stop", 5, 10), ("Church", 5, 10), ("Beach", 5, 10).>
+
+  ], 
+  emptyTt : TimeTable = [], 
+  noValueTt : TimeTable = ["Train1" +> <..>], -- timetable with no
+  noStationTimeTt : TimeTable = 
+  ["Train1" +> <.("Beach", 0, 5), ("Stop", 5, 5).>], 
+  stationNotInNetTt : TimeTable = 
+  ["Train1" +> <.("Beach", 0, 5), ("Church", 5, 10).>] 
+
+-- test_case 
+--   [addTram]
+--   addTram("Train2", wellFormedTt1), 
+--   [addStop]
+--   addStop("Train1", "Post", 6, 11, wellFormedTt1), 
+--   [isIn1]
+--   isIn("Train1", wellFormedTt1), 
+--   [isIn2]
+--   ~ isIn("Train3", wellFormedTt1), 
+--   [notEmptyTest1]
+--   isTimetableNotEmpty(wellFormedTt1), 
+--   [notEmptyTest2]
+--   ~ isTimetableNotEmpty(emptyTt), 
+--   [notEmptyTest3]
+--   ~ isTimetableNotEmpty(noValueTt), 
+--   [timeInStation1]
+--   arrivalLessThanDeparture(wellFormedTt1), 
+--   [timeInStation2]
+--   ~ arrivalLessThanDeparture(noStationTimeTt), 
+--   [timeTableStopsInNet2]
+--   ~ allStopsInPlanExistsInNet(stationNotInNetTt, wellFormedNet1), 
+--   [consecutiveStops]
+  -- NoConsecutiveStops(wellFormedTt1) 
+end
