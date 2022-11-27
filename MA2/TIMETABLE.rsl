@@ -66,7 +66,36 @@ scheme TIMETABLE =
             else checkConsecutiveStops(newlist, (stopid1, at1, dt1)) 
             end 
           end 
-        end 
+        end,
+
+      checkArrivalTimeLessThanDepature : TimeTable -> Bool 
+      checkArrivalTimeLessThanDepature(t) is
+        (all tram : TramId :- tram isin dom t => 
+        (all (s, at, dt) : (StopId >< Time >< Time) :- (s, at, dt) isin t(tram) => at < dt))
+      
+      -- drivingTimeIncrement : TimeTable >< Net -> Bool
+      -- drivingTimeIncrement(tt, n) is 
+      --   (all tram : TramId :- 
+      --       tram isin dom tt => checkDrivingTimeIncrement(tt(tram), ("", 0, 0), n))
+    
+      -- checkDrivingTimeIncrement : Plan >< (StopId >< Time >< Time) >< Net -> Bool
+      -- checkDrivingTimeIncrement(planlist, (stopid, at, dt), n) is
+      -- let (stopid1, at1, dt1) = hd (planlist), newlist = tl (planlist), drt = minDrivingTime(stopid, stopid1, n) in
+      --     if dt1 = stopid then false 
+      --     else 
+      --       if len (newlist) = 0 then true 
+      --       else checkDrivingTimeIncrement(newlist, (stopid1, at1, dt1), n) 
+      --       end 
+      --     end 
+      --   end 
+
+      
+
+    value /* predicates to check time tables */   
+      isWellformed : TimeTable >< Net -~-> Bool
+      isWellformed(t, n) is
+      isWellformed(n) -- Checks if the Net is well formed
+
     	 
 
   end

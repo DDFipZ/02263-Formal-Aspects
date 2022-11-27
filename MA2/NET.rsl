@@ -44,16 +44,24 @@ scheme NET =
       isIn(stopid, net) is 
         (exists (si, capacity) : Stop :- 
            (si, capacity) isin dom net /\ si = stopid), 
+
+      
       	 
       -- get the capacity of a stop     
       capacity : StopId >< Net -~-> Capacity
       capacity(stopid, net) is 
-        hd ({capacity | (si, capacity) : Stop :- (si, capacity) isin dom net /\ si = stopid}), 
-      	
+        let (s, c) = getStop(stopid, net) in
+          c 
+      	end,
+      getStopSet : Net -> Stop-set
+      getStopSet(n) is
+      {(si, c) | (si, c) : Stop :- (si, c) isin dom n},
+
       getStop : StopId >< Net -~-> Stop
-      getStop(stopid, net) is 
-        hd ({(si, net) | 
-             (si, net) : Stop :- (si, net) isin dom net /\ si = stopid}), 
+      getStop(stopid, net) is
+        hd(getStopSet(net)) 
+        pre getStopSet(net) ~= {},
+      
       	 
       -- check whether two stops are directly connected in a network  
       --          
