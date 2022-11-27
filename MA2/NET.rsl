@@ -1,28 +1,31 @@
 scheme NET = 
   class 
-    type 
+    type
+      -- given
       Net = Stop -m-> Connection-set, -- tram nets
       Headway = Time, -- minimum headways
       DrivingTime = Time, -- minimum driving times
       Time = Nat, -- times in number of minutes
       Capacity = Nat, -- capacities
+      StopId = Text, -- names of stops
+
+      -- own
       Connection = Stop >< Stop >< Capacity >< Headway >< DrivingTime, 
-      Stop = StopId >< Capacity, --Stops
-      StopId = Text -- names of stops    
+      Stop = StopId >< Capacity --Stops
     value /* generators */ 
       empty : Net = [], -- the empty net
-      -- insert a stop with a given name and capacity 
-      -- -- Create the Stop object and make it a key to an empty value
-      -- and return the new Net
-      	
+      
       insertStop : StopId >< Capacity >< Net -> Net
+        -- insert a stop with a given name and capacity 
+        -- -- Create the Stop object and make it a key to an empty value
+        -- and return the new Net
       insertStop(id, c, net) is net !! [(id, c) +> {}], 
-      	 
-      -- -- add a connection between given stops, 
-      -- -- with the given minimum headway, capacity and minimum driving
-      -- time
-      -- -- 1. Check if the stops are in the map.
-      -- -- 2. If so add a connection value to each of the stops    
+        -- -- add a connection between given stops, 
+        -- -- with the given minimum headway, capacity and minimum driving
+        -- time
+        -- -- 1. Check if the stops are in the map.
+        -- -- 2. If so add a connection value to each of the stops    
+      
       addConnection : 
         StopId >< StopId >< Headway >< Capacity >< DrivingTime >< Net -> Net
       addConnection(stopid_1, stopid_2, h, c, dt, net) is 
@@ -34,6 +37,7 @@ scheme NET =
          net(getStop(stopid_2, net)) union 
          {(getStop(stopid_2, net), getStop(stopid_1, net), h, c, dt)}] 
     	 
+    
     value /* observers */ 
       -- check whether a stop is in a network         
       isIn : StopId >< Net -> Bool
@@ -44,7 +48,7 @@ scheme NET =
       -- get the capacity of a stop     
       capacity : StopId >< Net -~-> Capacity
       capacity(stopid, net) is 
-        hd ({capacity | (si, capacity) : Stop :- (si, capacity) isin dom net}), 
+        hd ({capacity | (si, capacity) : Stop :- (si, capacity) isin dom net /\ si = stopid}), 
       	
       getStop : StopId >< Net -~-> Stop
       getStop(stopid, net) is 
