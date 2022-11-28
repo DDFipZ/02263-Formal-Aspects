@@ -117,15 +117,18 @@ scheme NET =
         else 0 
         end, 
       	 
-      -- value /* predicates to check nets */    
+      -- WellFormed requirements
+      symmetricalConnectionsReq : Net -> Bool
+      symmetricalConnectionsReq(n) is
+      (all (id, c) : Stop :- 
+        (id, c) isin dom n => 
+          (all (stop1, (stopid_2, c2), c, h, dt) : Connection :- 
+            (stop1, (stopid_2, c2), c, h, dt) isin n(getStop(id, n)) => 
+              areDirectlyConnected(id, stopid_2, n))),
       isWellformed : Net -> Bool
       isWellformed(n) is 
-        (all (id, c) : Stop :- 
-           (id, c) isin dom n => 
-             (all (stop1, (stopid_2, c2), c, h, dt) : Connection :- 
-                (stop1, (stopid_2, c2), c, h, dt) isin n(getStop(id, n)) => 
-                  areDirectlyConnected(id, stopid_2, n))) -- Requirement 1: Net connections needs to be symmetrical    
-        -- test values    
+          symmetricalConnectionsReq(n) -- Requirement 1: Net connections needs to be symmetrical    
+      
 
     	 
 

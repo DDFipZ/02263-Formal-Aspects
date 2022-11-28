@@ -6,17 +6,17 @@ class
     ...,
     TramId = Text -- tram names
 
-    value /* generators */
-      -- the empty timetable
-      empty : TimeTable = ...,
+  value /* generators */
+    -- the empty timetable
+    empty : TimeTable = ...,
 
-      -- add to a time table an empty plan for a new tram
-      addTram : TramId >< TimeTable -> TimeTable
-      ...,
+    -- add to a time table an empty plan for a new tram
+    addTram : TramId >< TimeTable -> TimeTable
+    ...,
 
-      -- add a stop with arrival time and departure time to the plan for a given tram
-      addStop : TramId >< StopId >< Time >< Time >< TimeTable -> TimeTable
-      ...
+    -- add a stop with arrival time and departure time to the plan for a given tram
+    addStop : TramId >< StopId >< Time >< Time >< TimeTable -> TimeTable
+    ...
 
   value /* observers */
      -- check whether a tram with a given name exists in a given time table

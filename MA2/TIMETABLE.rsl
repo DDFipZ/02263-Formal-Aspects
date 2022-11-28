@@ -11,34 +11,34 @@ scheme TIMETABLE =
         -list, 
       TramId = Text 
     	 
-    value 
-      empty : TimeTable = [], 
-      	
+    value /* generators */
       addTram : TramId >< TimeTable -> TimeTable
-      addTram(tramid, tt) is 
-        tt !! 
-        [tramid 
-         -- add a stop with arrival time and departure time to the plan for
-         -- a given tram 
-          +> <..>], 
+      -- add a stop with arrival time and departure time to the plan for
+      -- a given tram 
+      addTram(tramid, tt) is tt !! [tramid +> <..>], 
       	
       addStop : TramId >< StopId >< Time >< Time >< TimeTable -> TimeTable
       addStop(tramid, stopid, t1, t2, tt) is 
         tt !! [tramid +> tt(tramid) ^ <.(stopid, t1, t2).>] 
     	 
     value /* observers */ 
-    -- check whether a tram with a given name exists in a given time
-    -- table  
+      
       isIn : TramId >< TimeTable -> Bool
+        -- check whether a tram with a given name exists in a given time
+        -- table  
       isIn(tramid, tt) is (exists ti : TramId :- ti isin dom tt /\ ti = tramid), 
       	 
       -- you can add more observers here  
       isTimetableNotEmpty : TimeTable -> Bool
+      -- Checks for existing tram_ids and for each tram to have a non-empty plan
       isTimetableNotEmpty(tt) is 
-        (all plan : Plan :- plan isin rng tt => len (plan) > 0) /\ 
-        card (dom tt) > 0, 
+        (all plan : Plan :- plan isin rng tt =>
+          len (plan) > 0)
+          /\ card (dom tt) > 0,
       	
       arrivalLessThanDeparture : TimeTable -> Bool
+      -- for a given stop in plan,
+      --    arrival time should be less than departure time
       arrivalLessThanDeparture(tt) is 
         (all plan : Plan :- 
            plan isin rng tt => 
@@ -93,9 +93,6 @@ scheme TIMETABLE =
 
     value /* predicates to check time tables */   
       isWellformed : TimeTable >< Net -~-> Bool
-      isWellformed(t, n) is
-      isWellformed(n) -- Checks if the Net is well formed
-
-    	 
+      isWellformed(t, n) is false   	 
 
   end

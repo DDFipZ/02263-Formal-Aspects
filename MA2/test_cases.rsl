@@ -51,54 +51,36 @@ value
       (stopD, stopB, connBD_capacity ,connBD_head ,connBD_driveT)
       }
   ],
-  
 
-  wellFormedNet2 : Net = 
-    [
-      ("A", 2) +> {
-        (("A", 2), ("B", 6), 1, 1, 10)},
-      ("B", 6) +> {
-        (("B", 6), ("A", 2), 1, 1, 10),
-        (("B", 6), ("C", 2), 3, 2, 12),
-        (("B", 6), ("D", 2), 2, 2, 7)
-      },
-      ("C", 2) +> {
-      (("C", 2), ("B", 6), 3, 2, 12),
-      (("C", 2), ("E", 3), 1, 1, 5),
-      (("C", 2), ("F", 2), 1, 1, 6)
-      },
-      ("D", 2) +> {
-      (("D", 2), ("B", 6), 2, 2, 7),
-      (("D", 2), ("H", 2), 1, 1, 6)
-      },
-      ("H", 2) +> {
-        (("H", 2), ("D", 2), 1, 1, 6)
-        },
-      ("E", 3) +> {
-      (("E", 3), ("C", 2), 1, 1, 5),
-      (("E", 3), ("G", 3), 2, 2, 7)
-      },
-      ("G", 3) +> {
-        (("G", 3), ("E", 3), 2, 2, 7),
-        (("G", 3), ("F", 2), 1, 1, 6)
-        },
-      ("F", 2) +> {
-      (("F", 2), ("G", 3), 1, 1, 6)
-      }
-    ],
   emptyNet : Net = [],
   WfNet1_noD : Net = 
     [
-      ("A", 2) +> {
-        (("A", 2), ("B", 6), 1, 1, 10)},
-      ("B", 6) +> {
-        (("B", 6), ("A", 2), 1, 1, 10),
-        (("B", 6), ("C", 2), 2, 3, 12)
+      stopA +> {
+        (stopA, stopB, connAB_capacity ,connAB_head ,connAB_driveT)
         },
-      ("C", 2) +> {
-        (("C", 2), ("B", 6), 2, 3, 12)
+      stopB +> {
+        (stopB, stopA, connAB_capacity ,connAB_head ,connAB_driveT),
+        (stopB, stopC, connBC_capacity ,connBC_head ,connBC_driveT)
+        },
+      stopC +> {
+        (stopC, stopB, connBC_capacity ,connBC_head ,connBC_driveT)
         }
-    ]
+    ],
+
+    WfNet1_justStopD : Net = 
+      [
+        stopA +> {
+          (stopA, stopB, connAB_capacity ,connAB_head ,connAB_driveT)
+          },
+        stopB +> {
+          (stopB, stopA, connAB_capacity ,connAB_head ,connAB_driveT),
+          (stopB, stopC, connBC_capacity ,connBC_head ,connBC_driveT)
+          },
+        stopC +> {
+          (stopC, stopB, connBC_capacity ,connBC_head ,connBC_driveT)
+          },
+        stopD +> {}
+      ]
 
 test_case
   -- Net Observer functions
@@ -109,33 +91,33 @@ test_case
   [capacity_existingStop] 
     capacity(stopA_id, wellFormedNet1) = 2,
   [capacity_nonExistingStop]
-    capacity("Zzz", wellFormedNet1) = 0, -- unchecked TODO: What should this return? how do you check chaos?
+    capacity("Zzz", wellFormedNet1) = 0, -- TODO: What should this return? how do you check chaos?
   [getStop_existingStop]
-    getStop(stopA_id, wellFormedNet1) = stopA, -- unchecked  
+    getStop(stopA_id, wellFormedNet1) = stopA,
   [getStop_nonExistingStop]
-    getStop("Zzz", wellFormedNet1) ~= stopA, -- unchecked TODO: same as capacity_nonExistingStop
+    getStop("Zzz", wellFormedNet1) ~= stopA, -- TODO: same as capacity_nonExistingStop
   [areDirectlyConnected_connectedStops]
-    areDirectlyConnected(stopA_id, stopB_id, wellFormedNet1) = true,  -- unchecked
+    areDirectlyConnected(stopA_id, stopB_id, wellFormedNet1) = true, 
   [areDirectlyConnected_notConnectedStops]
-    areDirectlyConnected(stopA_id, stopC_id, wellFormedNet1) = false,  -- unchecked
+    areDirectlyConnected(stopA_id, stopC_id, wellFormedNet1) = false,
   [connectionCapicity_existingConn]
-    capacity(stopB_id, stopC_id, wellFormedNet1) = 3,  -- unchecked
+    capacity(stopB_id, stopC_id, wellFormedNet1) = connBC_capacity,
   [connectionCapicity_nonExistingConn]
-    capacity(stopA_id, stopD_id, wellFormedNet1) = 0,  -- unchecked TODO: What should this return?
+    capacity(stopA_id, stopD_id, wellFormedNet1) = 0, -- TODO: What should this return?
   [minHeadway_existingConn]
-    minHeadway(stopA_id, stopB_id, wellFormedNet1) = 1,  -- unchecked
+    minHeadway(stopA_id, stopB_id, wellFormedNet1) = connAB_head,
   [minHeadway_nonExistingConn]
-    minHeadway(stopA_id, stopD_id, wellFormedNet1) = 0,  -- unchecked TODO: Same as conn_capacity
+    minHeadway(stopA_id, stopD_id, wellFormedNet1) = 0,  -- TODO: Same as conn_capacity
   [DrivingTime1_existingConn]
-    minDrivingTime(stopB_id, stopD_id, wellFormedNet1) = 7,  -- unchecked
+    minDrivingTime(stopB_id, stopD_id, wellFormedNet1) = connBD_driveT,
   [DrivingTime_nonExistingConn]
-    minDrivingTime(stopA_id, stopC_id, wellFormedNet1) = 0,  -- unchecked TODO: Same as conn_capacity
+    minDrivingTime(stopA_id, stopC_id, wellFormedNet1) = 0,  -- TODO: Same as conn_capacity
 
   -- Net generator functions
   [insertStop_newStop]
-    insertStop(stopD_id, stopD_capacity, WfNet1_noD) = wellFormedNet1,  -- unchecked
-  [insertStop_existingStop]
-    insertStop(stopD_id, stopD_capacity, wellFormedNet1) = wellFormedNet1,  -- unchecked
+    insertStop(stopD_id, stopD_capacity, WfNet1_noD) = WfNet1_justStopD,
+  [insertStop_existingStop_UNDERCONSTRUCTION]
+    insertStop(stopD_id, stopD_capacity, wellFormedNet1) = WfNet1_justStopD,
   [addConnection_newConn]
     addConnection(stopB_id, stopD_id, connBD_head, connBD_capacity, connBD_driveT, insertStop(stopD_id, stopD_capacity, WfNet1_noD)) = wellFormedNet1, -- unchecked
   [addConnection_existingConn]
@@ -143,43 +125,124 @@ test_case
   [addConnection_nonExistingStop]
   addConnection("Zzz", stopD_id, 0, 0, 0, wellFormedNet1) = wellFormedNet1, -- unchecked TODO: What happens here?
   
-  -- Well formed tests  
-  [wffTest1]
+  -- Well formed tests 
+  [wffTest]
     isWellformed(wellFormedNet1)  -- unchecked
 
 -------------- TimeTable values and test cases --------------
-value 
+value
+  tram1_id : TramId = "Tram1",
+  tram1_plan : Plan =
+    <.
+      (stopA_id, 0, 1),
+      (stopB_id, 12, 14),
+      (stopC_id, 28, 32),
+      (stopB_id, 46, 48),
+      (stopA_id, 59, 60)
+    .>,
+
+  tram2_id : TramId = "Tram2",
+    tram2_plan : Plan =
+      <.
+        (stopD_id, 0, 2),
+        (stopB_id, 11, 13),
+        (stopA_id, 28, 32),
+        (stopB_id, 47, 50),
+        (stopD_id, 58, 60)
+      .>,
+
   wellFormedTt1 : TimeTable = 
-  ["Train1" +> <.("A", 0, 5), ("B", 16, 17), ("C", 30, 31).>], 
-  emptyTt : TimeTable = [], 
-  noValueTt : TimeTable = ["Train1" +> <..>], -- timetable with no
-  noStationTimeTt : TimeTable = 
-  ["Train1" +> <.("Beach", 0, 5), ("Stop", 5, 5).>], 
-  stationNotInNetTt : TimeTable = 
-  ["Train1" +> <.("Beach", 0, 5), ("Church", 5, 10).>] 
+    [
+      tram1_id +> tram1_plan,
+      tram2_id +> tram2_plan
+    ],
+
+  wellFormedTt1_extended : TimeTable = 
+    [
+      tram1_id +> <.
+        (stopA_id, 0, 1),
+        (stopB_id, 12, 14),
+        (stopC_id, 28, 32),
+        (stopB_id, 46, 48),
+        (stopA_id, 59, 60)
+      .>,
+      tram2_id +> tram2_plan
+    ]
+
+value -- NOT well formed TTs
+  emptyTt : TimeTable = [],
+
+  emptyPlanTt : TimeTable = [
+      tram1_id +> tram1_plan,
+      tram2_id +> <..>
+      ],
+
+  badStationTimeTt : TimeTable = [
+    tram1_id +>
+      <.
+        (stopD_id, 0, 2),
+        (stopB_id, 11, 13),
+        (stopA_id, 33, 32),
+        (stopB_id, 47, 50),
+        (stopD_id, 58, 60)
+      .>
+    ],
+
+  stationNotInNetTt : TimeTable = [
+      tram1_id +>
+        <.
+          (stopD_id, 0, 2),
+          ("Zzz", 11, 13),
+          (stopA_id, 33, 32),
+          (stopB_id, 47, 50),
+          (stopD_id, 58, 60)
+        .>
+      ],
+  notAdjacentStopsTt : TimeTable = 
+    [
+      tram1_id +> <.
+        (stopA_id, 0, 1),
+        (stopB_id, 12, 14),
+        (stopC_id, 28, 32),
+        (stopD_id, 46, 48),
+        (stopA_id, 59, 60)
+      .>,
+      tram2_id +> tram2_plan
+    ],
+
+  
+  myEnd : Int = 1
 
 test_case 
-  [checkDt]
-    drivingTimeIncrement(wellFormedTt1, wellFormedNet1)
---   addTram("Train2", wellFormedTt1), 
---   [addStop]
---   addStop("Train1", "Post", 6, 11, wellFormedTt1), 
---   [isIn1]
---   isIn("Train1", wellFormedTt1), 
---   [isIn2]
---   ~ isIn("Train3", wellFormedTt1), 
---   [notEmptyTest1]
---   isTimetableNotEmpty(wellFormedTt1), 
---   [notEmptyTest2]
---   ~ isTimetableNotEmpty(emptyTt), 
---   [notEmptyTest3]
---   ~ isTimetableNotEmpty(noValueTt), 
---   [timeInStation1]
---   arrivalLessThanDeparture(wellFormedTt1), 
---   [timeInStation2]
---   ~ arrivalLessThanDeparture(noStationTimeTt), 
---   [timeTableStopsInNet2]
---   ~ allStopsInPlanExistsInNet(stationNotInNetTt, wellFormedNet1), 
---   [consecutiveStops]
-  -- NoConsecutiveStops(wellFormedTt1) 
+  --  TimeTable observer tests
+  [isIn_existingTram]
+    isIn(tram1_id, wellFormedTt1) = true,
+  [isIn_notExistingTram]
+    isIn(tram1_id, wellFormedTt1) = false,
+  [notEmpty_fullTimeTable]
+    isTimetableNotEmpty(wellFormedTt1) = true, 
+  [notEmpty_completelyEmptyTt]
+    isTimetableNotEmpty(emptyTt) = false, 
+  [notEmpty_emptyPlan]
+    isTimetableNotEmpty(emptyPlanTt) = false,
+
+  [timesInStop_correctTimes]
+    arrivalLessThanDeparture(wellFormedTt1) = true, 
+  [timesInStop_badArrivalTime]
+    arrivalLessThanDeparture(badStationTimeTt) = false, 
+  [allPlanStopsInNet_allInNet]
+    allStopsInPlanExistsInNet(wellFormedTt1, wellFormedNet1) = true, 
+  [allPlanStopsInNet_notAllInNet]
+    allStopsInPlanExistsInNet(stationNotInNetTt, wellFormedNet1) = false, 
+  [consecutiveStops_consecutive]
+    NoConsecutiveStops(wellFormedTt1) = true,
+  [consecutiveStops_nonConsecutive]
+    NoConsecutiveStops(notAdjacentStopsTt) = false,
+
+  -- TimeTable generator functions
+  [addTram]
+    addTram("Train2", wellFormedTt1), 
+  [addStop]
+    addStop("Train1", "Post", 6, 11, wellFormedTt1)
+
 end
