@@ -87,6 +87,23 @@ wellFormedNet1 : Net =
         },
       stopD +> {}
     ],
+
+    WfNet1_stopDOverwrite : Net = 
+      [
+        stopA +> {
+          (stopA, stopB, connAB_capacity ,connAB_head ,connAB_driveT)
+          },
+        stopB +> {
+          (stopB, stopA, connAB_capacity ,connAB_head ,connAB_driveT),
+          (stopB, stopC, connBC_capacity ,connBC_head ,connBC_driveT),
+          (stopB, stopD, connBD_capacity ,connBD_head ,connBD_driveT)
+          },
+        stopC +> {
+          (stopC, stopB, connBC_capacity ,connBC_head ,connBC_driveT)
+          },
+        stopD +> {}
+      ],
+    
   
   selfconnectedStopNet : Net = 
     [
@@ -132,7 +149,7 @@ wellFormedNet1 : Net =
         (stopB, stopC, connBC_capacity ,connBC_head ,connBC_driveT)
         },
       stopC +> {
-        (stopC, stopB, connBC_capacity ,connBC_head ,connBC_driveT)
+        (stopC, stopB, 20 ,connBC_head ,connBC_driveT)
         },
       stopD +> {}
     ],
@@ -157,7 +174,7 @@ wellFormedNet1 : Net =
     [
       stopA +> {
         (stopA, stopB, connAB_capacity ,connAB_head ,connAB_driveT),
-        (stopA, stopB, connAB_capacity ,connAB_head ,connAB_driveT)
+        (stopA, stopB, 2, 1 ,3)
         },
       stopB +> {
         (stopB, stopA, connAB_capacity ,connAB_head ,connAB_driveT),
@@ -185,7 +202,7 @@ wellFormedNet1 : Net =
         (stopC, stopB, connBC_capacity ,connBC_head ,connBC_driveT)
         },
       stopD +> {
-        (stopD, stopB, connBD_capacity ,connBD_head ,connBD_driveT)
+        (stopD, stopB, 10 ,connBD_head ,connBD_driveT)
         }
     ],
 
@@ -196,7 +213,7 @@ wellFormedNet1 : Net =
 test_case
   -- Net Observer functions
   [isIn_existingStop]
-    isIn(stopA_id, wellFormedNet1) = true,
+    isIn(stopA_id, wellFormedNet1) = true, -- 
   [isIn_nonExistingStop]
     isIn("Zzz", wellFormedNet1) = false,
   [capacity_existingStop] 
@@ -227,16 +244,15 @@ test_case
   -- Net generator functions
   [insertStop_newStop]
     insertStop(stopD_id, stopD_capacity, WfNet1_noD) = WfNet1_justStopD,
-  [insertStop_existingStop_UNDERCONSTRUCTION]
-    insertStop(stopD_id, stopD_capacity, wellFormedNet1) = WfNet1_justStopD, -- order of the outputs makes the test fail.
+  [insertStop_existingStop]
+    insertStop(stopD_id, stopD_capacity, wellFormedNet1) = WfNet1_stopDOverwrite, -- order of the outputs makes the test fail.
   [addConnection_newConn]
     addConnection(stopB_id, stopD_id, connBD_head, connBD_capacity, connBD_driveT, insertStop(stopD_id, stopD_capacity, WfNet1_noD)) = wellFormedNet1, -- unchecked
   [addConnection_existingConn]
     addConnection(stopB_id, stopD_id, connBD_head, connBD_capacity, connBD_driveT, wellFormedNet1) = wellFormedNet1,
   [addConnection_nonExistingStop]
   addConnection("Zzz", stopD_id, 0, 0, 0, wellFormedNet1) = wellFormedNet1, -- unchecked TODO: What happens here?
-  [stopInStops]
-    stopInStops(testConnAB, {testConnAB, testConnBC}) = true,
+
 
   -- Well formed tests
   -- Stop test
@@ -253,17 +269,13 @@ test_case
   [stopReq3_noSelfConnection_incorrect]
     stopsNotAutoConnected(selfconnectedStopNet) = false,  -- unchecked
   [stopReq4_allStopsConnected_correct]
-    stopsNotAutoConnected(wellFormedNet1) = true,  -- unchecked
-  [stopReq4_allStopsConnected_incorrect_UNDERCONSTRUCTION]
-    stopsNotAutoConnected(isolatedStopNet) = false,  -- unchecked
+    noStopIsolated(wellFormedNet1) = true,  -- unchecked
+  [stopReq4_allStopsConnected_incorrect]
+    noStopIsolated(isolatedStopNet) = false,  -- unchecked
   [stopReq5_stopCapacityCompliant_correct]
     stopsComply(wellFormedNet1) = true,  -- unchecked
   [stopReq5_stopCapacityCompliant_incorrect]
     stopsComply(isolatedStopNet) = false,  -- unchecked
-  [stopReq6_noStopIsolated_correct]
-    noStopIsolated(wellFormedNet1) = true,
-  [stopReq6_noStopIsolated_incorrect]
-    noStopIsolated(isolatedStopNet) = false,
 
   -- Connection tests
   [connReq1_noDoubleConnection_correct_UNDERCONSTRUCTION]

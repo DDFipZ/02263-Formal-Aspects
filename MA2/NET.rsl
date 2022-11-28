@@ -153,31 +153,35 @@ scheme NET =
       -- Conn req 1
       noRepeatedConnections : Net -> Bool
       noRepeatedConnections(n) is 
-        (all cs : Connection-set :- cs isin rng n =>
-          let
-            conn_ = hd(cs),
-            (sd1_id, sa1_id) = getConnectionStopIds(conn_),
-            connSet_wo_conn = cs \ {conn_}
-          in
-            stopInStops(conn_, connSet_wo_conn)
-          end
-        ),
+      (all stops : Stop :- stops isin dom n => 
+        card({destination | (start, (destination, c), cap, h, dt) : Connection :- (start, (destination, c), cap, h, dt) isin n(stops)})
+        = card(n(stops))),
+
+      --   (all cs : Connection-set :- cs isin rng n =>
+      --     let
+      --       conn_ = hd(cs),
+      --       (sd1_id, sa1_id) = getConnectionStopIds(conn_),
+      --       connSet_wo_conn = cs \ {conn_}
+      --     in
+      --       stopInStops(conn_, connSet_wo_conn)
+      --     end
+      --   ),
       
-      stopInStops: Connection >< Connection-set -> Bool
-      stopInStops(((sd_id, sd_c),(sa_id, sa_c),c,h,dt), connSet) is 
-        (all conn : Connection :- conn isin connSet =>
-          if card(connSet) = 0 then false
-          else          
-            let
-              (sd1_id, sa1_id) = getConnectionStopIds(conn)
-            in
-                if sd_id = sd1_id /\ sa_id = sa1_id then true
-                else
-                  stopInStops(hd(connSet),connSet \ {hd(connSet)})
-                end
-            end
-          end
-        ),
+      -- stopInStops: Connection >< Connection-set -> Bool
+      -- stopInStops(((sd_id, sd_c),(sa_id, sa_c),c,h,dt), connSet) is 
+      --   (all conn : Connection :- conn isin connSet =>
+      --     if card(connSet) = 0 then false
+      --     else          
+      --       let
+      --         (sd1_id, sa1_id) = getConnectionStopIds(conn)
+      --       in
+      --           if sd_id = sd1_id /\ sa_id = sa1_id then true
+      --           else
+      --             stopInStops(hd(connSet),connSet \ {hd(connSet)})
+      --           end
+      --       end
+      --     end
+      --   ),
       
       -- no conn w/o welldefined stops
       -- Conn req 2
