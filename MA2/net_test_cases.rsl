@@ -247,47 +247,47 @@ test_case
   [insertStop_existingStop]
     insertStop(stopD_id, stopD_capacity, wellFormedNet1) = WfNet1_stopDOverwrite, -- order of the outputs makes the test fail.
   [addConnection_newConn]
-    addConnection(stopB_id, stopD_id, connBD_head, connBD_capacity, connBD_driveT, insertStop(stopD_id, stopD_capacity, WfNet1_noD)) = wellFormedNet1, -- unchecked
+    addConnection(stopB_id, stopD_id, connBD_head, connBD_capacity, connBD_driveT, insertStop(stopD_id, stopD_capacity, WfNet1_noD)) = wellFormedNet1, -- checked
   [addConnection_existingConn]
     addConnection(stopB_id, stopD_id, connBD_head, connBD_capacity, connBD_driveT, wellFormedNet1) = wellFormedNet1,
   [addConnection_nonExistingStop]
-  addConnection("Zzz", stopD_id, 0, 0, 0, wellFormedNet1) = wellFormedNet1, -- unchecked TODO: What happens here?
+  addConnection("Zzz", stopD_id, 0, 0, 0, wellFormedNet1) = wellFormedNet1, -- checked TODO: What happens here?
 
 
   -- Well formed tests
   -- Stop test
   [stopReq1_netNotEmpty_notEmpty_UNDERCONSTRUCTION]
-    netNotEmpty(wellFormedNet1) = true,  -- unchecked
+    netNotEmpty(wellFormedNet1) = true,  -- checked
   [stopReq1_netNotEmpty_Empty_UNDERCONSTRUCTION]
-    netNotEmpty(emptyNet) = false,  -- unchecked
+    netNotEmpty(emptyNet) = false,  -- checked
   [stopReq2_antisymmetry_correct]
-    connectionsAreSymmetrical(wellFormedNet1) = true,  -- unchecked
+    connectionsAreSymmetrical(wellFormedNet1) = true,  -- checked
   [stopReq2_antisymmetry_incorrect]
-    connectionsAreSymmetrical(notAntisymmetryNet) = false,  -- unchecked
+    connectionsAreSymmetrical(notAntisymmetryNet) = false,  -- checked
   [stopReq3_noSelfConnection_correct]
-    stopsNotAutoConnected(wellFormedNet1) = true,  -- unchecked
+    stopsNotAutoConnected(wellFormedNet1) = true,  -- checked
   [stopReq3_noSelfConnection_incorrect]
-    stopsNotAutoConnected(selfconnectedStopNet) = false,  -- unchecked
+    stopsNotAutoConnected(selfconnectedStopNet) = false,  -- checked
   [stopReq4_allStopsConnected_correct]
-    noStopIsolated(wellFormedNet1) = true,  -- unchecked
+    noStopIsolated(wellFormedNet1) = true,  -- checked
   [stopReq4_allStopsConnected_incorrect]
-    noStopIsolated(isolatedStopNet) = false,  -- unchecked
+    noStopIsolated(isolatedStopNet) = false,  -- checked
   [stopReq5_stopCapacityCompliant_correct]
-    stopsComply(wellFormedNet1) = true,  -- unchecked
+    stopsComply(wellFormedNet1) = true,  -- checked
   [stopReq5_stopCapacityCompliant_incorrect]
-    stopsComply(isolatedStopNet) = false,  -- unchecked
+    stopsComply(isolatedStopNet) = false,  -- checked
 
   -- Connection tests
   [connReq1_noDoubleConnection_correct_UNDERCONSTRUCTION]
-    noRepeatedConnections(wellFormedNet1) = true, -- unchecked
+    noRepeatedConnections(wellFormedNet1) = true, -- checked
   [connReq1_noDoubleConn_incorrect_UNDERCONSTRUCTION]
-    noRepeatedConnections(repeatedConnNet) = false, -- unchecked
+    noRepeatedConnections(repeatedConnNet) = false, -- checked
   [connReq2_compliantStop_correct]
-    stopsComply(wellFormedNet1) = true, -- unchecked
-    stopsComply(wellFormedNet1) = true, -- unchecked
+    stopsComply(wellFormedNet1) = true, -- checked
+    stopsComply(wellFormedNet1) = true, -- checked
   [connReq2_compliantStop_incorrect]
-    stopsComply(notComplinatStopNet) = false, -- unchecked
-    stopsComply(notComplinatStopNet) = false, -- unchecked
+    stopsComply(notComplinatStopNet) = false, -- checked
+    stopsComply(notComplinatStopNet) = false, -- checked
   [wff_finalTest]
-    isWellformed(wellFormedNet1) = true  -- unchecked
+    isWellformed(wellFormedNet1) = true  -- checked
 end

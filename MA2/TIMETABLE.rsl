@@ -90,6 +90,11 @@ scheme TIMETABLE =
 
     value /* predicates to check time tables */   
       isWellformed : TimeTable >< Net -~-> Bool
-      isWellformed(t, n) is false 
+      isWellformed(t, n) is 
+      isTimetableNotEmpty(t) /\
+      allStopsInPlanExistsInNet(t, n) /\
+      planStopsDirectlyConnected(t, n) /\
+      checkArrivalTimeLessThanDepature(t) /\
+      drivingTimeIncrement(t, n)
 
   end
