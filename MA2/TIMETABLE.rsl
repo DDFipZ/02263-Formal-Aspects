@@ -43,7 +43,14 @@ scheme TIMETABLE =
       planStopsDirectlyConnected : TimeTable >< Net -> Bool
       planStopsDirectlyConnected(tt, n) is 
         (all tram : TramId :- 
-           tram isin dom tt => checkConsecutiveStops(tt(tram),n, ("", 0, 0))), 
+           tram isin dom tt => 
+           let
+            (stopid1, at1, dt1) = hd (tt(tram)),
+            list_tail = tl (tt(tram))
+           in
+            checkConsecutiveStops(list_tail,n, (stopid1, at1, dt1))
+           end
+        ),
       	
       checkConsecutiveStops : Plan >< Net >< (StopId >< Time >< Time) -> Bool
       checkConsecutiveStops(planlist, n, (stopid, at, dt)) is 
@@ -69,7 +76,7 @@ scheme TIMETABLE =
             tram isin dom tt => checkDrivingTimeIncrement(tt(tram), ("", 0 ,0), n)),
     
       checkDrivingTimeIncrement : Plan >< (StopId >< Time >< Time) >< Net -> Bool
-      checkDrivingTimeIncrement(planlist, (stopid, at, dt), n, incr) is
+      checkDrivingTimeIncrement(planlist, (stopid, at, dt), n) is
       let (stopid1, at1, dt1) = hd (planlist), newlist = tl (planlist), drt = minDrivingTime(stopid, stopid1, n) in
           if  (at1 - dt) < drt then false 
           else 

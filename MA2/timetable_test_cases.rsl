@@ -105,25 +105,25 @@ test_case
     isTimetableNotEmpty(emptyPlanTt) = false,
 
   [timesInStop_correctTimes]
-    arrivalLessThanDeparture(wellFormedTt1) = true, 
+    checkArrivalTimeLessThanDepature(wellFormedTt1) = true, 
   [timesInStop_badArrivalTime]
-    arrivalLessThanDeparture(badStationTimeTt) = false, 
+    checkArrivalTimeLessThanDepature(badStationTimeTt) = false, 
   [allPlanStopsInNet_allInNet]
     allStopsInPlanExistsInNet(wellFormedTt1, wellFormedNet1) = true, 
   [allPlanStopsInNet_notAllInNet]
     allStopsInPlanExistsInNet(stationNotInNetTt, wellFormedNet1) = false, 
   [consecutiveStops_consecutive]
     planStopsDirectlyConnected(wellFormedTt1, wellFormedNet1) = true,
-  [consecutiveStops_nonConsecutive_UNDERWORK]
+  [consecutiveStops_nonConsecutive]
     planStopsDirectlyConnected(notAdjacentStopsTt, wellFormedNet1) = false,
 
   -- TimeTable generator functions
   [addTram_nonExistingTram]
-    addTram(tram2_id, wellFormed_tram1Tt) = [tram1_id +> tram1_plan, tram2_id +> <..>], -- unchecked
+    addTram(tram2_id, wellFormed_tram1Tt) = [tram1_id +> tram1_plan, tram2_id +> <..>],
   [addTram_existingTram]
-    addTram(tram2_id, wellFormedTt1) = [tram1_id +> tram1_plan, tram2_id +> <..>], -- unchecked
+    addTram(tram2_id, wellFormedTt1) = [tram1_id +> tram1_plan, tram2_id +> <..>],
   [addStop_nonExistingStop]
-    addStop(tram2_id, stopD_id, 0, 2, addTram(tram2_id, wellFormed_tram1Tt)) = [tram1_id +> tram1_plan, tram2_id +> <.(stopD_id, 0, 2).>],-- unchecked
+    addStop(tram2_id, stopD_id, 0, 2, addTram(tram2_id, wellFormed_tram1Tt)) = [tram1_id +> tram1_plan, tram2_id +> <.(stopD_id, 0, 2).>],
 
   [wellFormedTimeTable_underwork]
     isWellformed(wellFormedTt1, wellFormedNet1) = true
