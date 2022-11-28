@@ -150,10 +150,7 @@ test_case
 -------------- TimeTable values and test cases --------------
 value 
   wellFormedTt1 : TimeTable = 
-  ["Train1" +> <.("Beach", 0, 5), ("Stop", 5, 10), ("Church", 5, 10), ("Beach", 5, 10).>, 
-  "Train2" +> <.("Beach", 0, 5), ("Stop", 5, 10), ("Church", 5, 10), ("Beach", 5, 10).>
-
-  ], 
+  ["Train1" +> <.("A", 0, 5), ("B", 16, 17), ("C", 30, 31).>], 
   emptyTt : TimeTable = [], 
   noValueTt : TimeTable = ["Train1" +> <..>], -- timetable with no
   noStationTimeTt : TimeTable = 
@@ -161,8 +158,9 @@ value
   stationNotInNetTt : TimeTable = 
   ["Train1" +> <.("Beach", 0, 5), ("Church", 5, 10).>] 
 
--- test_case 
---   [addTram]
+test_case 
+  [checkDt]
+    drivingTimeIncrement(wellFormedTt1, wellFormedNet1)
 --   addTram("Train2", wellFormedTt1), 
 --   [addStop]
 --   addStop("Train1", "Post", 6, 11, wellFormedTt1), 
