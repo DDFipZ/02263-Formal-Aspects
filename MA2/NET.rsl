@@ -21,8 +21,7 @@ scheme NET =
         -- and return the new Net
       insertStop(id, c, net) is net !! [(id, c) +> {}], 
         -- -- add a connection between given stops, 
-        -- -- with the given minimum headway, capacity and minimum driving
-        -- time
+        -- -- with the given minimum headway, capacity and minimum driving time
         -- -- 1. Check if the stops are in the map.
         -- -- 2. If so add a connection value to each of the stops    
       
@@ -119,11 +118,14 @@ scheme NET =
       -- WellFormed requirements
       symmetricalConnectionsReq : Net -> Bool
       symmetricalConnectionsReq(n) is
-      (all (id, c) : Stop :- 
+      (
+        all (id, c) : Stop :- 
         (id, c) isin dom n => 
           (all (stop1, (stopid_2, c2), c, h, dt) : Connection :- 
             (stop1, (stopid_2, c2), c, h, dt) isin n(getStop(id, n)) => 
-              areDirectlyConnected(id, stopid_2, n))),
+              areDirectlyConnected(id, stopid_2, n)))
+      
+    value
       isWellformed : Net -> Bool
       isWellformed(n) is 
           symmetricalConnectionsReq(n) -- Requirement 1: Net connections needs to be symmetrical    

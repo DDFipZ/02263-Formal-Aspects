@@ -5,10 +5,7 @@ scheme TIMETABLE =
   class 
     type 
       TimeTable = TramId -m-> Plan, -- the empty timetable
-      Plan = 
-        (StopId >< Time >< Time) 
-        -- add to a time table an empty plan for a new tram
-        -list, 
+      Plan = (StopId >< Time >< Time)-list,-- add to a time table an empty plan for a new tram
       TramId = Text 
     	 
     value /* generators */
@@ -36,15 +33,6 @@ scheme TIMETABLE =
           len (plan) > 0)
           /\ card (dom tt) > 0,
       	
-      arrivalLessThanDeparture : TimeTable -> Bool
-      -- for a given stop in plan,
-      --    arrival time should be less than departure time
-      arrivalLessThanDeparture(tt) is 
-        (all plan : Plan :- 
-           plan isin rng tt => 
-             (all (stopid, at, dt) : StopId >< Time >< Time :- 
-                (stopid, at, dt) isin plan => at < dt)), 
-      	
       allStopsInPlanExistsInNet : TimeTable >< Net -> Bool
       allStopsInPlanExistsInNet(tt, n) is 
         (all plan : Plan :- 
@@ -52,26 +40,33 @@ scheme TIMETABLE =
              (all (stopid, at, dt) : StopId >< Time >< Time :- 
                 (stopid, at, dt) isin plan => isIn(stopid, n))), 
       	
-      NoConsecutiveStops : TimeTable -> Bool
-      NoConsecutiveStops(tt) is 
+      planStopsDirectlyConnected : TimeTable >< Net -> Bool
+      planStopsDirectlyConnected(tt, n) is 
         (all tram : TramId :- 
-           tram isin dom tt => checkConsecutiveStops(tt(tram), ("", 0, 0))), 
+           tram isin dom tt => checkConsecutiveStops(tt(tram),n, ("", 0, 0))), 
       	
-      checkConsecutiveStops : Plan >< (StopId >< Time >< Time) -> Bool
-      checkConsecutiveStops(planlist, (stopid, at, dt)) is 
-        let (stopid1, at1, dt1) = hd (planlist), newlist = tl (planlist) in 
-          if stopid1 = stopid then false 
+      checkConsecutiveStops : Plan >< Net >< (StopId >< Time >< Time) -> Bool
+      checkConsecutiveStops(planlist, n, (stopid, at, dt)) is 
+        let
+          (stopid1, at1, dt1) = hd (planlist),
+          newlist = tl (planlist) in 
+          if ~areDirectlyConnected(stopid, stopid1, n) then false 
           else 
             if len (newlist) = 0 then true 
-            else checkConsecutiveStops(newlist, (stopid1, at1, dt1)) 
+            else checkConsecutiveStops(newlist, n, (stopid1, at1, dt1)) 
             end 
           end 
         end,
 
-      checkArrivalTimeLessThanDepature : TimeTable -> Bool 
-      checkArrivalTimeLessThanDepature(t) is
-        (all tram : TramId :- tram isin dom t => 
-        (all (s, at, dt) : (StopId >< Time >< Time) :- (s, at, dt) isin t(tram) => at < dt))
+
+      arrivalLessThanDeparture : TimeTable -> Bool
+      -- for a given stop in plan,
+      --    arrival time should be less than departure time
+      arrivalLessThanDeparture(tt) is 
+        (all plan : Plan :- 
+           plan isin rng tt => 
+             (all (stopid, at, dt) : StopId >< Time >< Time :- 
+                (stopid, at, dt) isin plan => at < dt))
       
       -- drivingTimeIncrement : TimeTable >< Net -> Bool
       -- drivingTimeIncrement(tt, n) is 
