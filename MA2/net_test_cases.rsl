@@ -1,0 +1,131 @@
+TIMETABLE
+
+scheme net_test_cases = 
+extend TIMETABLE with 
+class
+-------------- Network values and test cases --------------
+value
+  stopA_id : StopId = "A",
+  stopA_capacity : Capacity = 2,
+  stopA : Stop = (stopA_id, stopA_capacity),
+
+  stopB_id : StopId = "B",
+  stopB_capacity : Capacity = 6,
+  stopB : Stop = (stopB_id, stopB_capacity),
+
+  stopC_id : StopId = "C",
+  stopC_capacity : Capacity = 2,
+  stopC : Stop = (stopC_id, stopC_capacity),
+
+  stopD_id : StopId = "D",
+  stopD_capacity : Capacity = 2,
+  stopD : Stop = (stopD_id, stopD_capacity),
+
+  connAB_capacity : Capacity = 1,
+  connAB_head : Headway = 1,
+  connAB_driveT : DrivingTime = 10,
+
+  connBC_capacity : Capacity = 3,
+  connBC_head : Headway = 2,
+  connBC_driveT : DrivingTime = 12,
+
+  connBD_capacity : Capacity = 2,
+  connBD_head : Headway = 2,
+  connBD_driveT : DrivingTime = 7,
+
+  wellFormedNet1 : Net = 
+    -- Capacity, Headway, DriveTime
+  [
+    stopA +> {
+      (stopA, stopB, connAB_capacity ,connAB_head ,connAB_driveT)
+      },
+    stopB +> {
+      (stopB, stopA, connAB_capacity ,connAB_head ,connAB_driveT),
+      (stopB, stopC, connBC_capacity ,connBC_head ,connBC_driveT),
+      (stopB, stopD, connBD_capacity ,connBD_head ,connBD_driveT)
+      },
+    stopC +> {
+      (stopC, stopB, connBC_capacity ,connBC_head ,connBC_driveT)
+      },
+    stopD +> {
+      (stopD, stopB, connBD_capacity ,connBD_head ,connBD_driveT)
+      }
+  ],
+
+  emptyNet : Net = [],
+  WfNet1_noD : Net = 
+    [
+      stopA +> {
+        (stopA, stopB, connAB_capacity ,connAB_head ,connAB_driveT)
+        },
+      stopB +> {
+        (stopB, stopA, connAB_capacity ,connAB_head ,connAB_driveT),
+        (stopB, stopC, connBC_capacity ,connBC_head ,connBC_driveT)
+        },
+      stopC +> {
+        (stopC, stopB, connBC_capacity ,connBC_head ,connBC_driveT)
+        }
+    ],
+
+    WfNet1_justStopD : Net = 
+      [
+        stopA +> {
+          (stopA, stopB, connAB_capacity ,connAB_head ,connAB_driveT)
+          },
+        stopB +> {
+          (stopB, stopA, connAB_capacity ,connAB_head ,connAB_driveT),
+          (stopB, stopC, connBC_capacity ,connBC_head ,connBC_driveT)
+          },
+        stopC +> {
+          (stopC, stopB, connBC_capacity ,connBC_head ,connBC_driveT)
+          },
+        stopD +> {}
+      ]
+
+test_case
+  -- Net Observer functions
+  [isIn_existingStop]
+    isIn(stopA_id, wellFormedNet1) = true,
+  [isIn_nonExistingStop]
+    isIn("Zzz", wellFormedNet1) = false,
+  [capacity_existingStop] 
+    capacity(stopA_id, wellFormedNet1) = 2,
+  [capacity_nonExistingStop]
+    capacity("Zzz", wellFormedNet1) = 0, -- TODO: What should this return? how do you check chaos?
+  [getStop_existingStop]
+    getStop(stopA_id, wellFormedNet1) = stopA,
+  [getStop_nonExistingStop]
+    getStop("Zzz", wellFormedNet1) ~= stopA, -- TODO: same as capacity_nonExistingStop
+  [areDirectlyConnected_connectedStops]
+    areDirectlyConnected(stopA_id, stopB_id, wellFormedNet1) = true, 
+  [areDirectlyConnected_notConnectedStops]
+    areDirectlyConnected(stopA_id, stopC_id, wellFormedNet1) = false,
+  [connectionCapicity_existingConn]
+    capacity(stopB_id, stopC_id, wellFormedNet1) = connBC_capacity,
+  [connectionCapicity_nonExistingConn]
+    capacity(stopA_id, stopD_id, wellFormedNet1) = 0, -- TODO: What should this return?
+  [minHeadway_existingConn]
+    minHeadway(stopA_id, stopB_id, wellFormedNet1) = connAB_head,
+  [minHeadway_nonExistingConn]
+    minHeadway(stopA_id, stopD_id, wellFormedNet1) = 0,  -- TODO: Same as conn_capacity
+  [DrivingTime1_existingConn]
+    minDrivingTime(stopB_id, stopD_id, wellFormedNet1) = connBD_driveT,
+  [DrivingTime_nonExistingConn]
+    minDrivingTime(stopA_id, stopC_id, wellFormedNet1) = 0,  -- TODO: Same as conn_capacity
+
+  -- Net generator functions
+  [insertStop_newStop]
+    insertStop(stopD_id, stopD_capacity, WfNet1_noD) = WfNet1_justStopD,
+  [insertStop_existingStop_UNDERCONSTRUCTION]
+    insertStop(stopD_id, stopD_capacity, wellFormedNet1) = WfNet1_justStopD, -- order of the outputs makes the test fail.
+  [addConnection_newConn]
+    addConnection(stopB_id, stopD_id, connBD_head, connBD_capacity, connBD_driveT, insertStop(stopD_id, stopD_capacity, WfNet1_noD)) = wellFormedNet1, -- unchecked
+  [addConnection_existingConn]
+    addConnection(stopB_id, stopD_id, connBD_head, connBD_capacity, connBD_driveT, wellFormedNet1) = wellFormedNet1,
+  [addConnection_nonExistingStop]
+  addConnection("Zzz", stopD_id, 0, 0, 0, wellFormedNet1) = wellFormedNet1, -- unchecked TODO: What happens here?
+  
+  -- Well formed tests 
+  [wffTest]
+    isWellformed(wellFormedNet1) = true  -- unchecked
+end

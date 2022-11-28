@@ -21,8 +21,7 @@ scheme NET =
         -- and return the new Net
       insertStop(id, c, net) is net !! [(id, c) +> {}], 
         -- -- add a connection between given stops, 
-        -- -- with the given minimum headway, capacity and minimum driving
-        -- time
+        -- -- with the given minimum headway, capacity and minimum driving time
         -- -- 1. Check if the stops are in the map.
         -- -- 2. If so add a connection value to each of the stops    
       
@@ -53,21 +52,23 @@ scheme NET =
         let (s, c) = getStop(stopid, net) in
           c 
       	end,
-      getStopSet : Net -> Stop-set
-      getStopSet(n) is
-      {(si, c) | (si, c) : Stop :- (si, c) isin dom n},
+        getStopSet : StopId >< Net -> Stop-set
+      getStopSet(stopid, n) is
+      {(si, c) | (si, c) : Stop :- (si, c) isin dom n /\ si = stopid},
 
       getStop : StopId >< Net -~-> Stop
       getStop(stopid, net) is
-        hd(getStopSet(net)) 
-        pre getStopSet(net) ~= {},
+        hd(getStopSet(stopid, net)) 
+        pre getStopSet(stopid, net) ~= {},
+      
       
       	 
       -- check whether two stops are directly connected in a network  
       --          
       areDirectlyConnected : StopId >< StopId >< Net -> Bool
       -- Requirement one
-      areDirectlyConnected(stopid1, stopid2, net) is 
+      areDirectlyConnected(stopid1, stopid2, net) is
+        isIn(stopid1, net) /\ isIn(stopid2, net) /\
         stopid2 isin 
           {stopid_2 | 
            (stop1, (stopid_2, c2), c, h, dt) : Connection :- 
@@ -85,7 +86,7 @@ scheme NET =
           hd ({h | 
                (stop1, (stopid_2, c2), c, h, dt) : Connection :- 
                  (stop1, (stopid_2, c2), c, h, dt) isin 
-                   net(getStop(stopid2, net))}) 
+                   net(getStop(stopid2, net))  /\ stopid_2 = stopid1}) 
         else 0 
         end, 
       	 
@@ -98,7 +99,7 @@ scheme NET =
           hd ({c | 
                (stop1, (stopid_2, c2), c, h, dt) : Connection :- 
                  (stop1, (stopid_2, c2), c, h, dt) isin 
-                   net(getStop(stopid2, net))}) 
+                   net(getStop(stopid2, net)) /\ stopid_2 = stopid1}) 
         else 0 
         end, 
       	 
@@ -111,19 +112,25 @@ scheme NET =
           hd ({dt | 
                (stop1, (stopid_2, c2), c, h, dt) : Connection :- 
                  (stop1, (stopid_2, c2), c, h, dt) isin 
-                   net(getStop(stopid2, net))}) 
+                   net(getStop(stopid2, net)) /\ stopid_2 = stopid1}) 
         else 0 
         end, 
       	 
-      -- value /* predicates to check nets */    
+      -- WellFormed requirements
+      symmetricalConnectionsReq : Net -> Bool
+      symmetricalConnectionsReq(n) is
+      (
+        all (id, c) : Stop :- 
+        (id, c) isin dom n => 
+          (all (stop1, (stopid_2, c2), c, h, dt) : Connection :- 
+            (stop1, (stopid_2, c2), c, h, dt) isin n(getStop(id, n)) => 
+              areDirectlyConnected(id, stopid_2, n)))
+      
+    value
       isWellformed : Net -> Bool
       isWellformed(n) is 
-        (all (id, c) : Stop :- 
-           (id, c) isin dom n => 
-             (all (stop1, (stopid_2, c2), c, h, dt) : Connection :- 
-                (stop1, (stopid_2, c2), c, h, dt) isin n(getStop(id, n)) => 
-                  areDirectlyConnected(id, stopid_2, n))) -- Requirement 1: Net connections needs to be symmetrical    
-        -- test values    
+          symmetricalConnectionsReq(n) -- Requirement 1: Net connections needs to be symmetrical    
+      
 
     	 
 

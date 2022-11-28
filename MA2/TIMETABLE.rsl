@@ -5,45 +5,33 @@ scheme TIMETABLE =
   class 
     type 
       TimeTable = TramId -m-> Plan, -- the empty timetable
-      Plan = 
-        (StopId >< Time >< Time) 
-        -- add to a time table an empty plan for a new tram
-        -list, 
+      Plan = (StopId >< Time >< Time)-list,-- add to a time table an empty plan for a new tram
       TramId = Text 
     	 
-    value 
-      empty : TimeTable = [], 
-      	
+    value /* generators */
       addTram : TramId >< TimeTable -> TimeTable
-      addTram(tramid, tt) is 
-        tt !! 
-        [tramid 
-         -- add a stop with arrival time and departure time to the plan for
-         -- a given tram 
-          +> <..>], 
+      -- add a stop with arrival time and departure time to the plan for
+      -- a given tram 
+      addTram(tramid, tt) is tt !! [tramid +> <..>], 
       	
       addStop : TramId >< StopId >< Time >< Time >< TimeTable -> TimeTable
       addStop(tramid, stopid, t1, t2, tt) is 
         tt !! [tramid +> tt(tramid) ^ <.(stopid, t1, t2).>] 
     	 
     value /* observers */ 
-    -- check whether a tram with a given name exists in a given time
-    -- table  
+      
       isIn : TramId >< TimeTable -> Bool
+        -- check whether a tram with a given name exists in a given time
+        -- table  
       isIn(tramid, tt) is (exists ti : TramId :- ti isin dom tt /\ ti = tramid), 
       	 
       -- you can add more observers here  
       isTimetableNotEmpty : TimeTable -> Bool
+      -- Checks for existing tram_ids and for each tram to have a non-empty plan
       isTimetableNotEmpty(tt) is 
-        (all plan : Plan :- plan isin rng tt => len (plan) > 0) /\ 
-        card (dom tt) > 0, 
-      	
-      arrivalLessThanDeparture : TimeTable -> Bool
-      arrivalLessThanDeparture(tt) is 
-        (all plan : Plan :- 
-           plan isin rng tt => 
-             (all (stopid, at, dt) : StopId >< Time >< Time :- 
-                (stopid, at, dt) isin plan => at < dt)), 
+        (all plan : Plan :- plan isin rng tt =>
+          len (plan) > 0)
+          /\ card (dom tt) > 0,
       	
       allStopsInPlanExistsInNet : TimeTable >< Net -> Bool
       allStopsInPlanExistsInNet(tt, n) is 
@@ -52,18 +40,27 @@ scheme TIMETABLE =
              (all (stopid, at, dt) : StopId >< Time >< Time :- 
                 (stopid, at, dt) isin plan => isIn(stopid, n))), 
       	
-      NoConsecutiveStops : TimeTable -> Bool
-      NoConsecutiveStops(tt) is 
+      planStopsDirectlyConnected : TimeTable >< Net -> Bool
+      planStopsDirectlyConnected(tt, n) is 
         (all tram : TramId :- 
-           tram isin dom tt => checkConsecutiveStops(tt(tram), ("", 0, 0))), 
+           tram isin dom tt => 
+           let
+            (stopid1, at1, dt1) = hd (tt(tram)),
+            list_tail = tl (tt(tram))
+           in
+            checkConsecutiveStops(list_tail,n, (stopid1, at1, dt1))
+           end
+        ),
       	
-      checkConsecutiveStops : Plan >< (StopId >< Time >< Time) -> Bool
-      checkConsecutiveStops(planlist, (stopid, at, dt)) is 
-        let (stopid1, at1, dt1) = hd (planlist), newlist = tl (planlist) in 
-          if stopid1 = stopid then false 
+      checkConsecutiveStops : Plan >< Net >< (StopId >< Time >< Time) -> Bool
+      checkConsecutiveStops(planlist, n, (stopid, at, dt)) is 
+        let
+          (stopid1, at1, dt1) = hd (planlist),
+          newlist = tl (planlist) in 
+          if ~areDirectlyConnected(stopid, stopid1, n) then false 
           else 
             if len (newlist) = 0 then true 
-            else checkConsecutiveStops(newlist, (stopid1, at1, dt1)) 
+            else checkConsecutiveStops(newlist, n, (stopid1, at1, dt1)) 
             end 
           end 
         end,
@@ -71,31 +68,28 @@ scheme TIMETABLE =
       checkArrivalTimeLessThanDepature : TimeTable -> Bool 
       checkArrivalTimeLessThanDepature(t) is
         (all tram : TramId :- tram isin dom t => 
-        (all (s, at, dt) : (StopId >< Time >< Time) :- (s, at, dt) isin t(tram) => at < dt))
+        (all (s, at, dt) : (StopId >< Time >< Time) :- (s, at, dt) isin t(tram) => at < dt)),
       
-      -- drivingTimeIncrement : TimeTable >< Net -> Bool
-      -- drivingTimeIncrement(tt, n) is 
-      --   (all tram : TramId :- 
-      --       tram isin dom tt => checkDrivingTimeIncrement(tt(tram), ("", 0, 0), n))
+      drivingTimeIncrement : TimeTable >< Net -> Bool
+      drivingTimeIncrement(tt, n) is 
+        (all tram : TramId :- 
+            tram isin dom tt => checkDrivingTimeIncrement(tt(tram), ("", 0 ,0), n)),
     
-      -- checkDrivingTimeIncrement : Plan >< (StopId >< Time >< Time) >< Net -> Bool
-      -- checkDrivingTimeIncrement(planlist, (stopid, at, dt), n) is
-      -- let (stopid1, at1, dt1) = hd (planlist), newlist = tl (planlist), drt = minDrivingTime(stopid, stopid1, n) in
-      --     if dt1 = stopid then false 
-      --     else 
-      --       if len (newlist) = 0 then true 
-      --       else checkDrivingTimeIncrement(newlist, (stopid1, at1, dt1), n) 
-      --       end 
-      --     end 
-      --   end 
+      checkDrivingTimeIncrement : Plan >< (StopId >< Time >< Time) >< Net -> Bool
+      checkDrivingTimeIncrement(planlist, (stopid, at, dt), n) is
+      let (stopid1, at1, dt1) = hd (planlist), newlist = tl (planlist), drt = minDrivingTime(stopid, stopid1, n) in
+          if  (at1 - dt) < drt then false 
+          else 
+            if len (newlist) = 0 then true 
+            else checkDrivingTimeIncrement(newlist, (stopid1, at1, dt1), n) 
+            end 
+          end 
+        end 
 
       
 
     value /* predicates to check time tables */   
       isWellformed : TimeTable >< Net -~-> Bool
-      isWellformed(t, n) is
-      isWellformed(n) -- Checks if the Net is well formed
-
-    	 
+      isWellformed(t, n) is false   	 
 
   end
