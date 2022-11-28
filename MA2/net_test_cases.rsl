@@ -33,24 +33,26 @@ value
   connBD_head : Headway = 2,
   connBD_driveT : DrivingTime = 7,
 
-  wellFormedNet1 : Net = 
-    -- Capacity, Headway, DriveTime
-  [
-    stopA +> {
-      (stopA, stopB, connAB_capacity ,connAB_head ,connAB_driveT)
-      },
-    stopB +> {
-      (stopB, stopA, connAB_capacity ,connAB_head ,connAB_driveT),
-      (stopB, stopC, connBC_capacity ,connBC_head ,connBC_driveT),
-      (stopB, stopD, connBD_capacity ,connBD_head ,connBD_driveT)
-      },
-    stopC +> {
-      (stopC, stopB, connBC_capacity ,connBC_head ,connBC_driveT)
-      },
-    stopD +> {
-      (stopD, stopB, connBD_capacity ,connBD_head ,connBD_driveT)
-      }
-  ],
+wellFormedNet1 : Net = 
+  -- Capacity, Headway, DriveTime
+[
+  stopA +> {
+    (stopA, stopB, connAB_capacity ,connAB_head ,connAB_driveT)
+    },
+  stopB +> {
+    (stopB, stopA, connAB_capacity ,connAB_head ,connAB_driveT),
+    (stopB, stopC, connBC_capacity ,connBC_head ,connBC_driveT),
+    (stopB, stopD, connBD_capacity ,connBD_head ,connBD_driveT)
+    },
+  stopC +> {
+    (stopC, stopB, connBC_capacity ,connBC_head ,connBC_driveT)
+    },
+  stopD +> {
+    (stopD, stopB, connBD_capacity ,connBD_head ,connBD_driveT)
+    }
+],
+
+  -- not wellFormed values for testing
 
   emptyNet : Net = [],
   WfNet1_noD : Net = 
@@ -67,20 +69,123 @@ value
         }
     ],
 
-    WfNet1_justStopD : Net = 
-      [
-        stopA +> {
-          (stopA, stopB, connAB_capacity ,connAB_head ,connAB_driveT)
-          },
-        stopB +> {
-          (stopB, stopA, connAB_capacity ,connAB_head ,connAB_driveT),
-          (stopB, stopC, connBC_capacity ,connBC_head ,connBC_driveT)
-          },
-        stopC +> {
-          (stopC, stopB, connBC_capacity ,connBC_head ,connBC_driveT)
-          },
-        stopD +> {}
-      ]
+  WfNet1_justStopD : Net = 
+    [
+      stopA +> {
+        (stopA, stopB, connAB_capacity ,connAB_head ,connAB_driveT)
+        },
+      stopB +> {
+        (stopB, stopA, connAB_capacity ,connAB_head ,connAB_driveT),
+        (stopB, stopC, connBC_capacity ,connBC_head ,connBC_driveT)
+        },
+      stopC +> {
+        (stopC, stopB, connBC_capacity ,connBC_head ,connBC_driveT)
+        },
+      stopD +> {}
+    ],
+  
+  selfconnectedStopNet : Net = 
+    [
+      stopA +> {
+        (stopA, stopB, connAB_capacity ,connAB_head ,connAB_driveT)
+        },
+      stopB +> {
+        (stopB, stopA, connAB_capacity ,connAB_head ,connAB_driveT),
+        (stopB, stopC, connBC_capacity ,connBC_head ,connBC_driveT),
+        (stopB, stopD, connBD_capacity ,connBD_head ,connBD_driveT)
+        },
+      stopC +> {
+        (stopC, stopB, connBC_capacity ,connBC_head ,connBC_driveT)
+        },
+      stopD +> {
+        (stopD, stopB, connBD_capacity ,connBD_head ,connBD_driveT),
+        (stopD, stopD, 1,1,1)
+        }
+    ],
+  notAntisymmetryNet : Net = 
+    [
+      stopA +> {
+        (stopA, stopB, connAB_capacity ,connAB_head ,connAB_driveT)
+        },
+      stopB +> {
+        (stopB, stopA, connAB_capacity ,connAB_head ,connAB_driveT),
+        (stopB, stopC, connBC_capacity ,connBC_head ,connBC_driveT)
+        },
+      stopC +> {
+        (stopC, stopB, connBC_capacity ,connBC_head ,connBC_driveT)
+        },
+      stopD +> {
+        (stopD, stopB, connBD_capacity ,connBD_head ,connBD_driveT)
+        }
+    ],
+  isolatedStopNet : Net = 
+    [
+      stopA +> {
+        (stopA, stopB, connAB_capacity ,connAB_head ,connAB_driveT)
+        },
+      stopB +> {
+        (stopB, stopA, connAB_capacity ,connAB_head ,connAB_driveT),
+        (stopB, stopC, connBC_capacity ,connBC_head ,connBC_driveT)
+        },
+      stopC +> {
+        (stopC, stopB, connBC_capacity ,connBC_head ,connBC_driveT)
+        },
+      stopD +> {}
+    ],
+  wrongStopCapacityNet : Net = 
+    [
+      stopA +> {
+        (stopA, stopB, connAB_capacity ,connAB_head ,connAB_driveT)
+        },
+      stopB +> {
+        (stopB, stopA, connAB_capacity ,connAB_head ,connAB_driveT),
+        (stopB, stopC, 2 ,connBC_head ,connBC_driveT),
+        (stopB, stopD, connBD_capacity ,connBD_head ,connBD_driveT)
+        },
+      stopC +> {
+        (stopC, stopB, connBC_capacity ,connBC_head ,connBC_driveT)
+        },
+      stopD +> {
+        (stopD, stopB, connBD_capacity ,connBD_head ,connBD_driveT)
+        }
+    ],
+    repeatedConnNet : Net = 
+    [
+      stopA +> {
+        (stopA, stopB, connAB_capacity ,connAB_head ,connAB_driveT),
+        (stopA, stopB, connAB_capacity ,connAB_head ,connAB_driveT)
+        },
+      stopB +> {
+        (stopB, stopA, connAB_capacity ,connAB_head ,connAB_driveT),
+        (stopB, stopC, connBC_capacity ,connBC_head ,connBC_driveT),
+        (stopB, stopD, connBD_capacity ,connBD_head ,connBD_driveT)
+        },
+      stopC +> {
+        (stopC, stopB, connBC_capacity ,connBC_head ,connBC_driveT)
+        },
+      stopD +> {
+        (stopD, stopB, connBD_capacity ,connBD_head ,connBD_driveT)
+        }
+    ],
+    notComplinatStopNet : Net =
+    [
+      stopA +> {
+        (stopA, stopB, connAB_capacity ,connAB_head ,connAB_driveT)
+        },
+      stopB +> {
+        (stopB, stopA, connAB_capacity ,connAB_head ,connAB_driveT),
+        (stopB, stopC, connBC_capacity ,connBC_head ,connBC_driveT),
+        (stopB, stopD, connBD_capacity ,connBD_head ,connBD_driveT)
+        },
+      stopC +> {
+        (stopC, stopB, connBC_capacity ,connBC_head ,connBC_driveT)
+        },
+      stopD +> {
+        (stopD, stopB, connBD_capacity ,connBD_head ,connBD_driveT)
+        }
+    ],
+  
+  myval : Int = 1
 
 test_case
   -- Net Observer functions
@@ -125,7 +230,38 @@ test_case
   [addConnection_nonExistingStop]
   addConnection("Zzz", stopD_id, 0, 0, 0, wellFormedNet1) = wellFormedNet1, -- unchecked TODO: What happens here?
   
-  -- Well formed tests 
-  [wffTest]
+  -- Well formed tests
+  -- Stop test
+  [stopReq1_netNotEmpty_notEmpty]
+    netNotEmpty(wellFormedNet1) = true,  -- unchecked
+  [stopReq1_netNotEmpty_Empty]
+    netNotEmpty(emptyNet) = false,  -- unchecked
+  [stopReq2_antisymmetry_correct]
+    connectionsAreSymmetrical(wellFormedNet1) = true,  -- unchecked
+  [stopReq2_antisymmetry_incorrect]
+    connectionsAreSymmetrical(notAntisymmetryNet) = false,  -- unchecked
+  [stopReq3_noSelfConnection_correct]
+    stopsNotAutoConnected(wellFormedNet1) = true,  -- unchecked
+  [stopReq3_noSelfConnection_incorrect]
+    stopsNotAutoConnected(selfconnectedStopNet) = false,  -- unchecked
+  [stopReq4_allStopsConnected_correct]
+    stopsNotAutoConnected(wellFormedNet1) = true,  -- unchecked
+  [stopReq4_allStopsConnected_incorrect]
+    stopsNotAutoConnected(isolatedStopNet) = false,  -- unchecked
+  [stopReq5_stopCapacityCompliant_correct]
+    stopCapacitiesComply(wellFormedNet1) = true,  -- unchecked
+  [stopReq5_stopCapacityCompliant_incorrect]
+    stopCapacitiesComply(isolatedStopNet) = false,  -- unchecked
+
+  -- Connection tests
+  [connReq1_noDoubleConnection_correct]
+    noRepeatedConnections(wellFormedNet1) = true, -- unchecked
+  [connReq1_noDoubleConn_incorrect]
+    noRepeatedConnections(repeatedConnNet) = false, -- unchecked
+  [connReq2_compliantStop_correct]
+    stopCapacitiesComply(wellFormedNet1) = true, -- unchecked
+  [connReq2_compliantStop_incorrect]
+    stopCapacitiesComply(notComplinatStopNet) = false, -- unchecked
+  [wff_finalTest]
     isWellformed(wellFormedNet1) = true  -- unchecked
 end

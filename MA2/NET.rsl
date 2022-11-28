@@ -61,8 +61,6 @@ scheme NET =
         hd(getStopSet(stopid, net)) 
         pre getStopSet(stopid, net) ~= {},
       
-      
-      	 
       -- check whether two stops are directly connected in a network  
       --          
       areDirectlyConnected : StopId >< StopId >< Net -> Bool
@@ -114,22 +112,58 @@ scheme NET =
                  (stop1, (stopid_2, c2), c, h, dt) isin 
                    net(getStop(stopid2, net)) /\ stopid_2 = stopid1}) 
         else 0 
-        end, 
-      	 
-      -- WellFormed requirements
-      symmetricalConnectionsReq : Net -> Bool
-      symmetricalConnectionsReq(n) is
-      (
-        all (id, c) : Stop :- 
-        (id, c) isin dom n => 
-          (all (stop1, (stopid_2, c2), c, h, dt) : Connection :- 
-            (stop1, (stopid_2, c2), c, h, dt) isin n(getStop(id, n)) => 
-              areDirectlyConnected(id, stopid_2, n)))
+        end
       
     value
+      -- WellFormed requirement
+      -- Stop requirements
+      netNotEmpty: Net -> Bool -- TODO: Missing implementation
+      netNotEmpty(n) is false,
+
+      connectionsAreSymmetrical : Net -> Bool
+      connectionsAreSymmetrical(n) is
+        (all (id, c) : Stop :- 
+          (id, c) isin dom n => 
+            (all (stop1, (stopid_2, c2), c, h, dt) : Connection :- 
+              (stop1, (stopid_2, c2), c, h, dt) isin n(getStop(id, n)) => 
+                areDirectlyConnected(id, stopid_2, n))),
+
+      stopsNotAutoConnected: Net -> Bool
+      stopsNotAutoConnected(n) is 
+        (all (id, c) : Stop :- 
+          (id, c) isin dom n => 
+            (all (stop1, (stopid_2, c2), c, h, dt) : Connection :- 
+              (stop1, (stopid_2, c2), c, h, dt) isin n(getStop(id, n)) => id ~= stopid_2)),
+      
+
+      noStopIsolated:Net -> Bool
+      noStopIsolated(n) is false,
+
+      -- Connection requirements
+      -- Conn req 1
+      noRepeatedConnections : Net -> Bool
+      noRepeatedConnections(n) is false,
+      
+      -- no conn w/o welldefined stops
+      -- Conn req 2
+      stopCapacitiesComply: Net -> Bool
+      -- all stops need to have valid dep. and arr. stops
+      stopCapacitiesComply(n) is false,
+
+
       isWellformed : Net -> Bool
       isWellformed(n) is 
-          symmetricalConnectionsReq(n) -- Requirement 1: Net connections needs to be symmetrical    
+        netNotEmpty(n) /\ -- stopReq1
+        connectionsAreSymmetrical(n) /\ -- stopReq2
+        stopsNotAutoConnected(n) /\ -- stopReq3
+        stopsNotAutoConnected(n) /\ -- stopReq4
+        stopCapacitiesComply(n) /\ -- stopReq5
+        noRepeatedConnections(n) /\ -- connReq1
+        stopCapacitiesComply(n) /\ -- connReq2
+        
+        true
+
+
       
 
     	 
