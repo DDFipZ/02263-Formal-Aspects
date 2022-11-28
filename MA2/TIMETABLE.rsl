@@ -90,6 +90,6 @@ scheme TIMETABLE =
 
     value /* predicates to check time tables */   
       isWellformed : TimeTable >< Net -~-> Bool
-      isWellformed(t, n) is false   	 
+      isWellformed(t, n) is false 
 
   end
