@@ -87,8 +87,29 @@ value -- NOT well formed TTs
       .>,
       tram2_id +> tram2_plan
     ],
+    notIdenticalAdjacentStopsTt : timetable = 
+    [
+      tram_id +>
+      <.
+      (stopA_id, 0, 1),
+      (stopA_id, 12, 14),
+      (stopC_id, 28, 32),
+      (stopD_id, 46, 48),
+      (stopA_id, 59, 60)
+      .>,
+      tram2_id +> tram2_plan
+    ],
+    incrementStationTimeTt : TimeTable = [
+    tram1_id +>
+      <.
+        (stopD_id, 0, 2),
+        (stopB_id, 11, 13),
+        (stopA_id, 5, 9),
+        (stopB_id, 47, 50),
+        (stopD_id, 58, 60)
+      .>
+    ],
 
-  
   myEnd : Int = 1
 
 test_case 
@@ -97,12 +118,6 @@ test_case
     isIn(tram1_id, wellFormedTt1) = true,
   [isIn_notExistingTram]
     isIn("tramNnn", wellFormedTt1) = false,
-  [notEmpty_fullTimeTable]
-    isTimetableNotEmpty(wellFormedTt1) = true, 
-  [notEmpty_completelyEmptyTt]
-    isTimetableNotEmpty(emptyTt) = false, 
-  [notEmpty_emptyPlan]
-    isTimetableNotEmpty(emptyPlanTt) = false,
 
   [timesInStop_correctTimes]
     checkArrivalTimeLessThanDepature(wellFormedTt1) = true, 
@@ -125,7 +140,36 @@ test_case
   [addStop_nonExistingStop]
     addStop(tram2_id, stopD_id, 0, 2, addTram(tram2_id, wellFormed_tram1Tt)) = [tram1_id +> tram1_plan, tram2_id +> <.(stopD_id, 0, 2).>],
 
+  -- Well formed tests
+  -- Stop test
+  [timetableReq1_notEmpty_fullTimeTable]
+    isTimetableNotEmpty(wellFormedTt1) = true, -- unchecked
+  [timetableReq1_notEmpty_completelyEmptyTt]
+    isTimetableNotEmpty(emptyTt) = false,  -- unchecked
+  [timetableReq1_notEmpty_emptyPlan]
+    isTimetableNotEmpty(emptyPlanTt) = false, -- unchecked
+  [timetableReq2_allPlanStopsInNet_allInNet]
+    allStopsExistsInNet(wellFormedNet1) = true, -- unchecked 
+  [timetableReq2_allPlanStopsInNet_notAllInNet]
+    allStopsExistsInNet(stationNotInNetTt) = false,  -- unchecked
+  [timetableReq3_consecutiveStops_same]
+    stopsDirectlyConnected(wellFormedNet1) = true, -- unchecked
+  [timetableReq3_consecutiveStops_notSame]
+    stopsDirectlyConnected(notIdenticalAdjacentStopsTt) = false, -- unchecked
+  [timetableReq4_consecutiveStops_consecutive]
+    stopsDirectlyConnected(wellFormedNet1) = true, -- unchecked
+  [timetableReq4_consecutiveStops_nonConsecutive]
+    stopsDirectlyConnected(notAdjacentStopsTt) = false, -- unchecked
+  [timetableReq5_timesInStop_correctTimes]
+    arrivalTimeLessThanDepature(wellFormedTt1) = true,  -- unchecked
+  [timetableReq5_timesInStop_badArrivalTime]
+    arrivalTimeLessThanDepature(badStationTimeTt) = false -- unchecked
+  [timetableReq6_timesInStop_incremented]
+    incrementAllTime(wellFormedTt1) = true,  -- unchecked
+  [timetableReq6_timesInStop_badIncrement]
+    incrementAllTime(incrementStationTimeTt) = false -- unchecked
+
   [wellFormedTimeTable_underwork]
-    isWellformed(wellFormedTt1, wellFormedNet1) = true
+    isWellformed(wellFormedTt1, wellFormedNet1) = true -- unchecked
 
 end
