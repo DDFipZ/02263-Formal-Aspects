@@ -67,7 +67,8 @@ scheme NET =
       --          
       areDirectlyConnected : StopId >< StopId >< Net -> Bool
       -- Requirement one
-      areDirectlyConnected(stopid1, stopid2, net) is 
+      areDirectlyConnected(stopid1, stopid2, net) is
+        isIn(stopid1, net) /\ isIn(stopid2, net) /\
         stopid2 isin 
           {stopid_2 | 
            (stop1, (stopid_2, c2), c, h, dt) : Connection :- 

@@ -58,31 +58,28 @@ scheme TIMETABLE =
           end 
         end,
 
-
-      arrivalLessThanDeparture : TimeTable -> Bool
-      -- for a given stop in plan,
-      --    arrival time should be less than departure time
-      arrivalLessThanDeparture(tt) is 
-        (all plan : Plan :- 
-           plan isin rng tt => 
-             (all (stopid, at, dt) : StopId >< Time >< Time :- 
-                (stopid, at, dt) isin plan => at < dt))
+      checkArrivalTimeLessThanDepature : TimeTable -> Bool 
+      checkArrivalTimeLessThanDepature(t) is
+        (all tram : TramId :- tram isin dom t => 
+        (all (s, at, dt) : (StopId >< Time >< Time) :- (s, at, dt) isin t(tram) => at < dt)),
       
-      -- drivingTimeIncrement : TimeTable >< Net -> Bool
-      -- drivingTimeIncrement(tt, n) is 
-      --   (all tram : TramId :- 
-      --       tram isin dom tt => checkDrivingTimeIncrement(tt(tram), ("", 0, 0), n))
+      drivingTimeIncrement : TimeTable >< Net -> Bool
+      drivingTimeIncrement(tt, n) is 
+        (all tram : TramId :- 
+            tram isin dom tt => checkDrivingTimeIncrement(tt(tram), ("", 0 ,0), n)),
     
-      -- checkDrivingTimeIncrement : Plan >< (StopId >< Time >< Time) >< Net -> Bool
-      -- checkDrivingTimeIncrement(planlist, (stopid, at, dt), n) is
-      -- let (stopid1, at1, dt1) = hd (planlist), newlist = tl (planlist), drt = minDrivingTime(stopid, stopid1, n) in
-      --     if dt1 = stopid then false 
-      --     else 
-      --       if len (newlist) = 0 then true 
-      --       else checkDrivingTimeIncrement(newlist, (stopid1, at1, dt1), n) 
-      --       end 
-      --     end 
-      --   end
+      checkDrivingTimeIncrement : Plan >< (StopId >< Time >< Time) >< Net -> Bool
+      checkDrivingTimeIncrement(planlist, (stopid, at, dt), n, incr) is
+      let (stopid1, at1, dt1) = hd (planlist), newlist = tl (planlist), drt = minDrivingTime(stopid, stopid1, n) in
+          if  (at1 - dt) < drt then false 
+          else 
+            if len (newlist) = 0 then true 
+            else checkDrivingTimeIncrement(newlist, (stopid1, at1, dt1), n) 
+            end 
+          end 
+        end 
+
+      
 
     value /* predicates to check time tables */   
       isWellformed : TimeTable >< Net -~-> Bool
