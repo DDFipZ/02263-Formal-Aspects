@@ -249,9 +249,13 @@ test_case
   [stopReq4_allStopsConnected_incorrect]
     stopsNotAutoConnected(isolatedStopNet) = false,  -- unchecked
   [stopReq5_stopCapacityCompliant_correct]
-    stopCapacitiesComply(wellFormedNet1) = true,  -- unchecked
+    stopsComply(wellFormedNet1) = true,  -- unchecked
   [stopReq5_stopCapacityCompliant_incorrect]
-    stopCapacitiesComply(isolatedStopNet) = false,  -- unchecked
+    stopsComply(isolatedStopNet) = false,  -- unchecked
+  [stopReq6_noStopIsolated_correct]
+    noStopIsolated(wellFormedNet1) = true,
+  [stopReq6_noStopIsolated_incorrect]
+    noStopIsolated(isolatedStopNet) = false,
 
   -- Connection tests
   [connReq1_noDoubleConnection_correct]
@@ -259,9 +263,9 @@ test_case
   [connReq1_noDoubleConn_incorrect]
     noRepeatedConnections(repeatedConnNet) = false, -- unchecked
   [connReq2_compliantStop_correct]
-    stopCapacitiesComply(wellFormedNet1) = true, -- unchecked
+    stopsComply(wellFormedNet1) = true, -- unchecked
   [connReq2_compliantStop_incorrect]
-    stopCapacitiesComply(notComplinatStopNet) = false, -- unchecked
+    stopsComply(notComplinatStopNet) = false, -- unchecked
   [wff_finalTest]
     isWellformed(wellFormedNet1) = true  -- unchecked
 end
