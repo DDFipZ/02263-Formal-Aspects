@@ -110,14 +110,17 @@ scheme TIMETABLE =
           list_tail1 = tl (plan1),
           list_tail2 = tl (plan2)
         in
-         if len(list_tail1) = 0 \/ len(list_tail2) = 0 then true
-          else
+
             if stopid1 = stopid2 /\ stopid_1 = stopid_2 /\ ((abs(dt1 - dt2) < minHeadway(stopid1, stopid_1, n)) \/ (abs(at_1 - at_2) < minHeadway(stopid1, stopid_1, n))) then false
             else
-              checkHeadwayBetweenTrams(list_tail1, (stopid_1, at_1, dt_1), list_tail2, (stopid_2, at_2, dt_2), n)
-            end
-          end
+              if len(list_tail1) = 0 \/ len(list_tail2) = 0 then true
+              else
+                checkHeadwayBetweenTrams(list_tail1, (stopid_1, at_1, dt_1), list_tail2, (stopid_2, at_2, dt_2), n)
+              end
+            end       
         end
+      
+      
 
       
       
