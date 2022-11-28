@@ -84,8 +84,42 @@ scheme TIMETABLE =
             else checkDrivingTimeIncrement(newlist, (stopid1, at1, dt1), n) 
             end 
           end 
-        end 
+        end, 
+      
+      correctHeadwayBetweenTrams : TimeTable >< Net-> Bool
+      correctHeadwayBetweenTrams(tt, n) is
+      (all tram1 : TramId :- tram1 isin dom tt =>
+        (all tram2 : TramId :- tram2 isin {trams | trams : TramId :- trams isin dom tt /\ trams ~= tram1} =>
+          let
+            (stopid1, at1, dt1) = hd (tt(tram1)),
+            (stopid2, at2, dt2) = hd (tt(tram2)),
+            list_tail1 = tl (tt(tram1)),
+            list_tail2 = tl (tt(tram2))
+            
+          in
+            checkHeadwayBetweenTrams(list_tail1, (stopid1, at1, dt1), list_tail2, (stopid2, at2, dt2), n)
+          end
+        )
+      ),
 
+      checkHeadwayBetweenTrams : Plan >< (StopId >< Time >< Time) >< Plan >< (StopId >< Time >< Time) >< Net -> Bool 
+      checkHeadwayBetweenTrams(plan1, (stopid1, at1, dt1), plan2, (stopid2, at2, dt2), n) is
+        let
+          (stopid_1, at_1, dt_1) = hd (plan1),
+          (stopid_2, at_2, dt_2) = hd (plan2),
+          list_tail1 = tl (plan1),
+          list_tail2 = tl (plan2)
+        in
+         if len(list_tail1) = 0 \/ len(list_tail2) = 0 then true
+          else
+            if stopid1 = stopid2 /\ stopid_1 = stopid_2 /\ ((abs(dt1 - dt2) < minHeadway(stopid1, stopid_1, n)) \/ (abs(at_1 - at_2) < minHeadway(stopid1, stopid_1, n))) then false
+            else
+              checkHeadwayBetweenTrams(list_tail1, (stopid_1, at_1, dt_1), list_tail2, (stopid_2, at_2, dt_2), n)
+            end
+          end
+        end
+
+      
       
 
     value /* predicates to check time tables */   

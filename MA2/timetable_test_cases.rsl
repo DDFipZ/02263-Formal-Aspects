@@ -14,7 +14,15 @@ value
       (stopB_id, 46, 48),
       (stopA_id, 59, 60)
     .>,
-
+  tram1d_id : TramId = "Tram1Duplicate",
+  tram1d_plan : Plan =
+    <.
+      (stopA_id, 0, 1),
+      (stopB_id, 12, 14),
+      (stopC_id, 28, 32),
+      (stopB_id, 46, 48),
+      (stopA_id, 59, 60)
+    .>,
   tram2_id : TramId = "Tram2",
     tram2_plan : Plan =
       <.
@@ -34,7 +42,7 @@ value
     [
       tram1_id +> tram1_plan
     ],
-
+  
   wellFormedTt1_extended : TimeTable = 
     [
       tram1_id +> <.
@@ -87,7 +95,11 @@ value -- NOT well formed TTs
       .>,
       tram2_id +> tram2_plan
     ],
-
+  overbookedTt : TimeTable = 
+    [
+      tram1_id +> tram1_plan,
+      tram1d_id +> tram1d_plan
+    ],
   
   myEnd : Int = 1
 
@@ -116,7 +128,10 @@ test_case
     planStopsDirectlyConnected(wellFormedTt1, wellFormedNet1) = true,
   [consecutiveStops_nonConsecutive]
     planStopsDirectlyConnected(notAdjacentStopsTt, wellFormedNet1) = false,
-
+  [checkHeadwayBetweenTrams1]
+    correctHeadwayBetweenTrams(wellFormedTt1, wellFormedNet1) = true,
+  [checkHeadwayBetweenTrams2] 
+    correctHeadwayBetweenTrams(overbookedTt, wellFormedNet1) = false,
   -- TimeTable generator functions
   [addTram_nonExistingTram]
     addTram(tram2_id, wellFormed_tram1Tt) = [tram1_id +> tram1_plan, tram2_id +> <..>],
