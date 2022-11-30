@@ -37,24 +37,24 @@ value
   testConnAB : Connection = (stopA, stopB, connAB_capacity ,connAB_head ,connAB_driveT),
   testConnBC : Connection = (stopB, stopC, connBC_capacity ,connBC_head ,connBC_driveT),
 
-wellFormedNet1 : Net = 
-  -- Capacity, Headway, DriveTime
-[
-  stopA +> {
-    (stopA, stopB, connAB_capacity ,connAB_head ,connAB_driveT)
-    },
-  stopB +> {
-    (stopB, stopA, connAB_capacity ,connAB_head ,connAB_driveT),
-    (stopB, stopC, connBC_capacity ,connBC_head ,connBC_driveT),
-    (stopB, stopD, connBD_capacity ,connBD_head ,connBD_driveT)
-    },
-  stopC +> {
-    (stopC, stopB, connBC_capacity ,connBC_head ,connBC_driveT)
-    },
-  stopD +> {
-    (stopD, stopB, connBD_capacity ,connBD_head ,connBD_driveT)
-    }
-],
+  wellFormedNet1 : Net = 
+    -- Capacity, Headway, DriveTime
+  [
+    stopA +> {
+      (stopA, stopB, connAB_capacity ,connAB_head ,connAB_driveT)
+      },
+    stopB +> {
+      (stopB, stopA, connAB_capacity ,connAB_head ,connAB_driveT),
+      (stopB, stopC, connBC_capacity ,connBC_head ,connBC_driveT),
+      (stopB, stopD, connBD_capacity ,connBD_head ,connBD_driveT)
+      },
+    stopC +> {
+      (stopC, stopB, connBC_capacity ,connBC_head ,connBC_driveT)
+      },
+    stopD +> {
+      (stopD, stopB, connBD_capacity ,connBD_head ,connBD_driveT)
+      }
+  ],
 
   -- not wellFormed values for testing
 
@@ -286,6 +286,8 @@ test_case
     stopsComply(wellFormedNet1) = true, -- checked
     stopsComply(wellFormedNet1) = true, -- checked
   [connReq2_compliantStop_incorrect]
+    -- TODO: This is wrong.
+    -- it checks wether the capacity of a connection
     stopsComply(notComplinatStopNet) = false, -- checked
     stopsComply(notComplinatStopNet) = false, -- checked
   [wff_finalTest]
